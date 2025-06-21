@@ -26,9 +26,6 @@ class AffogatoServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->loadConsoleCommands();
         }
-        Event::listen(
-            CRUDEvent::class
-        );
     }
 
     /**
