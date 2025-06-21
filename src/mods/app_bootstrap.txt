@@ -3,7 +3,7 @@
         $middleware->append(\Zchted\Affogato\ForceJsonResponse::class);
 
     })
-    ->withExceptions(function (Exceptions $exceptions) {
+    ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->reportable(function (\Throwable $exception) {
             Log::error('Exception occurred', [
                 'exception' => [
@@ -17,7 +17,6 @@
             ]);
         });
 
-        // Return JSON response for all exceptions
         $exceptions->renderable(function (\Throwable $exception, Request $request) {
             $response = [
                 'status' => false,
@@ -44,3 +43,4 @@
             }
             return response()->json($response, ($exception->getCode() === 0) ? 500 : $exception->getCode()); // You can modify the status code based on the exception type
         });
+    })->create();

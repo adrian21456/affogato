@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
+use Zchted\Affogato\LoginController;
 use Zchted\Affogato\ConfiguratorController;
 use Zchted\Affogato\ExpireSanctumTokens;
 use Zchted\Affogato\ForceJsonResponse;
