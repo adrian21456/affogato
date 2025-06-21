@@ -15,8 +15,6 @@ beforeEach(function () {
 
     $this->payload = \App\Models\Demo::factory()->make()->toArray();
 
-    $this->maxDuration = 15;
-
     $response = test()->postJson('/api/demo', test()->payload)->json();
     test()->pk_value = $response['result']['demo_id'];
 });
