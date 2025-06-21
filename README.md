@@ -16,6 +16,8 @@ Composer Plugin for Laravel RDBMS Development
    php install:api
    ```
 
+   Add `use HasApiTokens` in App/Models/User.php
+
 3. Link storage:
 
    ```bash
