@@ -26,6 +26,12 @@ class Command
         if (!file_exists(base_path("core/__roles.json"))) {
             file_put_contents(base_path("core/__roles.json"), '["Administrator"]');
         }
+
+        if (!file_exists(base_path("routes/mods.php"))) {
+            file_put_contents(base_path("routes/mods.php"), "<?php
+
+use Illuminate\Support\Facades\Route;");
+        }
     }
 
 
