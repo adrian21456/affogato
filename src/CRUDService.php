@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Services;
+namespace Zchted\Affogato;
 
 use Zchted\Affogato\CRUDEvent;
 use Illuminate\Database\Eloquent\Model;

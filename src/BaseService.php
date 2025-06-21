@@ -1,6 +1,6 @@
 <?php
 
-namespace Zchted;
+namespace Zchted\Affogato;
 
 use Zchted\Affogato\AuditLog;
 use Illuminate\Http\Request;
