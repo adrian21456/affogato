@@ -33,6 +33,10 @@ class Command
             mkdir(base_path("app/Models/Mods"), 0777, true);
         }
 
+        if (!is_dir(base_path("tests/Feature/CRUD"))) {
+            mkdir(base_path("tests/Feature/CRUD"), 0777, true);
+        }
+
         if (!file_exists(base_path("core/__ignored_configs.json"))) {
             file_put_contents(base_path("core/__ignored_configs.json"), "[]");
         }
@@ -466,6 +470,22 @@ use Illuminate\Support\Facades\Route;");
                 file_put_contents(app_path("Http/Controllers/api/$fileName"), $file);
                 echo "MOD: $controllerName has been created in app/Http/Controllers/" . PHP_EOL;
             }
+
+            //Create Test
+            $lowerName = strtolower($commandName);
+            $name = str_replace("_", " ", $commandName);
+            $modName = ucwords($name);
+            $modName = str_replace(" ", "", $modName);
+            $fileName = $modName . ".php";
+
+            $file = file_get_contents(__DIR__ . ("/mods/ModTest.php.txt")); // Example path
+            $file = str_replace("demo", $lowerName, $file);
+            $file = str_replace("Demo", $modName, $file);
+            $file = str_ireplace("ModMod", "Mod", $file);
+
+            file_put_contents(base_path("tests/Feature/CRUD/$fileName"), $file);
+            echo "Model: $modName has been created in tests/Feature/CRUD/" . PHP_EOL;
+
 
             //Create Routes
             $routes = file_get_contents(__DIR__ . ("/mods/Routes.txt"));

@@ -112,4 +112,53 @@ class AffogatoModel extends Model
         //        dd($rules);
         return $rules;
     }
+
+    public function generateFakeData(): array
+    {
+        $faker = \Faker\Factory::create();
+        $fakeData = [];
+
+        foreach ($this->fillable as $field) {
+            $type = $this->casts[$field] ?? 'string';
+
+            switch ($type) {
+                case 'int':
+                case 'integer':
+                    $fakeData[$field] = $faker->numberBetween(1, 100);
+                    break;
+
+                case 'float':
+                case 'double':
+                    $fakeData[$field] = $faker->randomFloat(2, 1, 1000);
+                    break;
+
+                case 'boolean':
+                    $fakeData[$field] = $faker->boolean;
+                    break;
+
+                case 'date':
+                case 'datetime':
+                    $fakeData[$field] = $faker->dateTime()->format('Y-m-d H:i:s');
+                    break;
+
+                case 'array':
+                    $fakeData[$field] = [$faker->word, $faker->word];
+                    break;
+
+                case 'json':
+                    $fakeData[$field] = json_encode(['key' => $faker->word]);
+                    break;
+
+                default: // Treat as string
+                    if (isset($this->enumerable[$field]) && is_array($this->enumerable[$field])) {
+                        $fakeData[$field] = $faker->randomElement($this->enumerable[$field]);
+                    } else {
+                        $fakeData[$field] = $faker->words(2, true);
+                    }
+                    break;
+            }
+        }
+
+        return $fakeData;
+    }
 }

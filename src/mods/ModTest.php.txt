@@ -1,0 +1,119 @@
+<?php
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
+use PHPUnit\Framework\Assert;
+
+uses(RefreshDatabase::class);
+
+beforeEach(function () {
+    $this->user = User::factory()->create([
+        env('TEST_USER_FIELD', 'email') => env('TEST_USER_FIELD_VALUE', 'admin@gmail.com'),
+    ]);
+
+    Sanctum::actingAs($this->user);
+
+    $this->payload = \App\Models\Demo::factory()->make()->toArray();
+
+    $this->maxDuration = 15;
+
+    $response = test()->postJson('/api/demo', test()->payload)->json();
+    test()->pk_value = $response['result']['demo_id'];
+});
+
+function assertDurationLessThan($start, $label, $max = null): void
+{
+    if(empty($max)) $max = env('TEST_MAX_DURATION', 15);
+    $duration = microtime(true) - $start;
+
+    Assert::assertLessThanOrEqual(
+        $max,
+        $duration,
+        "{$label} exceeded {$max}s, took {$duration}s"
+    );
+}
+                    
+function assertValidApiResponse($response, $keywords = ['error', 'fail', 'exception', 'warning']): void
+{
+    $json = $response->json();
+
+    // Assert "status" exists and is true (boolean)
+    Assert::assertArrayHasKey('status', $json, "Missing 'status' key in response.");
+    Assert::assertTrue($json['status'], "'status' is not true.");
+
+    // Check for error-related keywords in the entire response JSON string
+    $flattened = strtolower(json_encode($json));
+
+    foreach ($keywords as $keyword) {
+        Assert::assertStringNotContainsString(
+            strtolower($keyword),
+            $flattened,
+            "Response contains the keyword '{$keyword}'."
+        );
+    }
+}
+
+it('can create a demo', function () {
+    $start = microtime(true);
+
+    $response = $this->postJson('/api/demo', $this->payload)->assertOk();
+
+    assertDurationLessThan($start, 'Create');
+    assertValidApiResponse($response);
+
+    $pk_value = $response->json()['result']['demo_id'];
+    expect($pk_value)->toBeInt();
+});
+
+it('can list demo', function () {
+    $start = microtime(true);
+
+    $this->getJson('/api/demo')
+        ->assertOk()
+        ->assertJsonFragment(['demo_id' => test()->pk_value]);
+
+    assertDurationLessThan($start, 'List');
+});
+
+it('can search demo', function () {
+    $start = microtime(true);
+
+    // Adjust if your search API differs
+    $this->postJson('/api/demo/search', $this->payload)
+        ->assertOk()
+        ->assertJsonFragment($this->payload);
+
+    assertDurationLessThan($start, 'Search');
+});
+
+it('can update a demo', function () {
+
+    $updatedPayload = [];
+    foreach ($this->payload as $key => $value) {
+        if(is_string($value)) {
+            $value .= 'Updated .';
+        }
+        $updatedPayload[$key] = $value;
+    }
+
+    $start = microtime(true);
+
+    $this->postJson("/api/demo/" . test()->pk_value, $updatedPayload)
+        ->assertOk()
+        ->assertJsonFragment($updatedPayload);
+
+    assertDurationLessThan($start, 'Update');
+});
+
+it('can delete a demo', function () {
+    $start = microtime(true);
+
+    $this->deleteJson("/api/demo/" . test()->pk_value)
+        ->assertOk();
+
+    assertDurationLessThan($start, 'Delete');
+
+    $this->getJson('/api/demo')
+        ->assertOk()
+        ->assertJsonMissing(['demo_id' => test()->pk_value]);
+});

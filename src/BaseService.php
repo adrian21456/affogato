@@ -10,11 +10,13 @@ class BaseService
 
     public static function writeAuditLog($module, $action, $user_id, $data_before = '', $data_after = '')
     {
-        AuditLog::create([
-            'module' => getModuleName(__CLASS__),
-            'action' => getActionName(__FUNCTION__),
-            'user_id' => auth()->id() ?? 1,
-        ]);
+        if (!empty($user_id)) {
+            AuditLog::create([
+                'module' => getModuleName(__CLASS__),
+                'action' => getActionName(__FUNCTION__),
+                'user_id' => auth()->id() ?? 1,
+            ]);
+        }
     }
 
     public static function requestValidator(Request $request, array $rules)
