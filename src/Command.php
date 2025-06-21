@@ -3,6 +3,7 @@
 namespace Zchted\Affogato;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class Command
 {
@@ -1227,5 +1228,25 @@ $fieldsCode
         }
 
         return $resolved;
+    }
+
+    public static function runSeeder($command): void
+    {
+        $sortedConfigs = Command::getSortedConfigurations();
+
+        foreach ($sortedConfigs as $configName) {
+            $modelClass = 'App\\Models\\' . Str::studly($configName);
+
+            if (class_exists($modelClass)) {
+                if ($modelClass::count() === 0) {
+                    $modelClass::factory()->count(intval(env("SEEDER_COUNT", "10")))->create();
+                    $command->info("✅Seeded: $modelClass");
+                } else {
+                    $command->info("ℹ️Already seeded: $modelClass");
+                }
+            } else {
+                $command->warn("⚠️Model not found for config: $configName");
+            }
+        }
     }
 }
