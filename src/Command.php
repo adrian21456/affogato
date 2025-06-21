@@ -46,8 +46,8 @@ class Command
 use Illuminate\Support\Facades\Route;");
         }
 
-        if (!file_exists(base_path("database/migrations/___create_logs___.php"))) {
-            copy(__DIR__ . "/mods/___create_logs___.php", base_path("database/migrations/___create_logs___.php"));
+        if (!file_exists(base_path("database/migrations/___create_audit_log___.php"))) {
+            copy(__DIR__ . "/mods/___create_audit_log___.php", base_path("database/migrations/___create_audit_log___.php"));
         }
     }
 
@@ -1214,7 +1214,7 @@ $fieldsCode
             $fullPath = $directory . DIRECTORY_SEPARATOR . $file;
 
             // Check if it's a file and contains "___"
-            if (is_file($fullPath) && str_contains($file, '___')) {
+            if (is_file($fullPath) && str_contains($file, '___') && !str_contains($file, '___create_audit_log___')) {
                 if (!unlink($fullPath)) {
                     echo "Failed to delete: $file\n";
                 }
