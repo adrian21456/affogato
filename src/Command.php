@@ -5,7 +5,7 @@ namespace Zchted\Affogato;
 use Illuminate\Support\Facades\Log;
 use Zchted\Affogato\Helpers;
 
-class Zchted extends Helpers
+class Command extends Helpers
 {
     private static $special_columns = ["created_at", "updated_at", "deleted_at"];
     public static function makeConfig($config_name, $columns, $type = 'int'): array

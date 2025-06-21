@@ -19,5 +19,12 @@
     "laravel/framework": "^12.0",
     "doctrine/inflector": "^2.0"
   },
-  "minimum-stability": "stable"
+  "minimum-stability": "stable",
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Zchted\\Affogato\\AffogatoServiceProvider"
+      ]
+    }
+  }
 }
