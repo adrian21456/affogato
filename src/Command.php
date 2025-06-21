@@ -20,6 +20,19 @@ class Command
         if (!is_dir(base_path("core/logs"))) {
             mkdir(base_path("core/logs"), 0777, true);
         }
+
+        if (!is_dir(base_path("app/Http/Controllers/Mods"))) {
+            mkdir(base_path("app/Http/Controllers/Mods"), 0777, true);
+        }
+
+        if (!is_dir(base_path("app/Http/Controllers/Api"))) {
+            mkdir(base_path("app/Http/Controllers/Api"), 0777, true);
+        }
+
+        if (!is_dir(base_path("app/Models/Mods"))) {
+            mkdir(base_path("app/Models/Mods"), 0777, true);
+        }
+
         if (!file_exists(base_path("core/__ignored_configs.json"))) {
             file_put_contents(base_path("core/__ignored_configs.json"), "[]");
         }
@@ -34,7 +47,7 @@ use Illuminate\Support\Facades\Route;");
         }
 
         if (!file_exists(base_path("database/migrations/__create_logs__.php"))) {
-            copy(__DIR__ . "/mods/__create_logs__.php", base_path("database/migrations/__create_logs__.php"));
+            copy(__DIR__ . "/mods/___create_logs___.php", base_path("database/migrations/___create_logs___.php"));
         }
     }
 
