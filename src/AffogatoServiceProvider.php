@@ -3,6 +3,9 @@
 namespace Zchted\Affogato;
 
 use Illuminate\Support\ServiceProvider;
+use Zchted\Affogato\CRUDEvent;
+use Illuminate\Support\Facades\Event;
+
 
 class AffogatoServiceProvider extends ServiceProvider
 {
@@ -23,6 +26,9 @@ class AffogatoServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->loadConsoleCommands();
         }
+        Event::listen(
+            CRUDEvent::class
+        );
     }
 
     /**
