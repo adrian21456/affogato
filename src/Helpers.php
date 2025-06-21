@@ -2,6 +2,7 @@
 
 use Doctrine\Inflector\InflectorFactory;
 use GuzzleHttp\Psr7\UploadedFile;
+use PHPUnit\Framework\Assert;
 
 function getModuleName($controllerName): string
 {
@@ -166,4 +167,36 @@ function removeLinesWithBrackets(string $content): string
     });
 
     return implode(PHP_EOL, $filtered);
+}
+
+function assertDurationLessThan($start, $label, $max = null): void
+{
+    if (empty($max)) $max = env('TEST_MAX_DURATION', 15);
+    $duration = microtime(true) - $start;
+
+    Assert::assertLessThanOrEqual(
+        $max,
+        $duration,
+        "{$label} exceeded {$max}s, took {$duration}s"
+    );
+}
+
+function assertValidApiResponse($response, $keywords = ['error', 'fail', 'exception', 'warning']): void
+{
+    $json = $response->json();
+
+    // Assert "status" exists and is true (boolean)
+    Assert::assertArrayHasKey('status', $json, "Missing 'status' key in response.");
+    Assert::assertTrue($json['status'], "'status' is not true.");
+
+    // Check for error-related keywords in the entire response JSON string
+    $flattened = strtolower(json_encode($json));
+
+    foreach ($keywords as $keyword) {
+        Assert::assertStringNotContainsString(
+            strtolower($keyword),
+            $flattened,
+            "Response contains the keyword '{$keyword}'."
+        );
+    }
 }
