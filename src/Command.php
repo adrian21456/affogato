@@ -32,6 +32,10 @@ class Command
 
 use Illuminate\Support\Facades\Route;");
         }
+
+        if (!file_exists(base_path("database/migrations/__create_logs__.php"))) {
+            copy(__DIR__ . "/mods/__create_logs__.php", base_path("database/migrations/__create_logs__.php"));
+        }
     }
 
 
