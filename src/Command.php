@@ -46,7 +46,7 @@ class Command
 use Illuminate\Support\Facades\Route;");
         }
 
-        if (!file_exists(base_path("database/migrations/__create_logs__.php"))) {
+        if (!file_exists(base_path("database/migrations/___create_logs___.php"))) {
             copy(__DIR__ . "/mods/___create_logs___.php", base_path("database/migrations/___create_logs___.php"));
         }
     }
