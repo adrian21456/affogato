@@ -3,9 +3,8 @@
 namespace Zchted\Affogato;
 
 use Illuminate\Support\Facades\Log;
-use Zchted\Affogato\Helpers;
 
-class Command extends Helpers
+class Command
 {
     private static $special_columns = ["created_at", "updated_at", "deleted_at"];
     public static function makeConfig($config_name, $columns, $type = 'int'): array
@@ -21,8 +20,8 @@ class Command extends Helpers
 
             //Change Contents
             $id = $config_name . "_id";
-            $proper_name = self::properName($config_name);
-            $plural_name = self::pluralize($proper_name);
+            $proper_name = properName($config_name);
+            $plural_name = pluralize($proper_name);
 
             $config['name'] = $config_name;
             $config['representative_value'] = $id;
@@ -244,7 +243,7 @@ class Command extends Helpers
     {
         try {
             $column = json_decode(file_get_contents(base_path("mods/column.json")), true);
-            $proper_name = self::properName($column_name);
+            $proper_name = properName($column_name);
 
             $column['type'] = $type;
             $column['ui']['default']['table_label'] = rtrim($proper_name, " Id");
@@ -656,7 +655,7 @@ class Command extends Helpers
                     }
                 }
 
-                $codeName = str_replace(' ', '', self::properName($key));
+                $codeName = str_replace(' ', '', properName($key));
 
                 $joins .= "'{$key}', ";
                 $imports .= "use App\Models\\" . $codeName . ";\n";
@@ -670,7 +669,7 @@ class Command extends Helpers
                         $relationship_code .= "public function {$key}(): HasOne {\n\t\treturn \$this->hasOne(" . $codeName . "::class, '" . $config['name'] . "_id" . "', '" . $config['name'] . "_id" . "');\n\t}\n\n\t";
                     } else {
                         $relationship_code .= "public function {$key}(): HasMany {\n\t\treturn \$this->hasMany(" . $codeName . "::class, '" . $config['name'] . "_id" . "', '" . $config['name'] . "_id" . "');\n\t}\n\n\t";
-                        //                        $relationship_code .= "public function " . pluralize($key) . "(): HasMany {\n\t\treturn \$this->hasMany(" . self::properName($key) . "::class, '" . $config['name'] . "_id" . "', '" . $config['name'] . "_id" . "');\n\t}\n\n\t";
+                        //                        $relationship_code .= "public function " . pluralize($key) . "(): HasMany {\n\t\treturn \$this->hasMany(" . properName($key) . "::class, '" . $config['name'] . "_id" . "', '" . $config['name'] . "_id" . "');\n\t}\n\n\t";
                     }
                 }
             }
@@ -944,7 +943,7 @@ class Command extends Helpers
         $modelName = ucfirst($json['name']);
         $columns = $json['columns'];
 
-        $modelName = self::properName($modelName);
+        $modelName = properName($modelName);
         $modelName = str_replace(" ", "", $modelName);
 
         $factoryClass = "{$modelName}Factory";
@@ -1032,8 +1031,8 @@ class $factoryClass extends Factory
 
             // Foreign key factory relationship
             if ($column['foreign']) {
-                $fieldProper = self::properName(ucfirst(str_replace('_id', '', $field)));
-                $fieldCode = str_replace(' ', '', self::properName($fieldProper));
+                $fieldProper = properName(ucfirst(str_replace('_id', '', $field)));
+                $fieldCode = str_replace(' ', '', properName($fieldProper));
                 $faker = '=> \\App\\Models\\' . $fieldCode . '::get([\'' . $field . '\'])->random()';
                 $fieldMappings[] = "            '$field' $faker,";
             } else {
