@@ -1,7 +1,6 @@
 {
   "name": "zchted/affogato",
   "description": "Micro Micro Rawr Rawr :)",
-  "version": "1.0.0",
   "type": "library",
   "license": "MIT",
   "autoload": {
