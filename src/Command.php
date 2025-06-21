@@ -8,6 +8,27 @@ use Illuminate\Support\Str;
 class Command
 {
     private static $special_columns = ["created_at", "updated_at", "deleted_at"];
+
+    public static function boot()
+    {
+        if (!is_dir(base_path("core"))) {
+            mkdir(base_path("core"), 0777, true);
+        }
+        if (!is_dir(base_path("core/backups"))) {
+            mkdir(base_path("core/backups"), 0777, true);
+        }
+        if (!is_dir(base_path("core/logs"))) {
+            mkdir(base_path("core/logs"), 0777, true);
+        }
+        if (!file_exists(base_path("core/__ignored_configs.json"))) {
+            file_put_contents(base_path("core/__ignored_configs.json"), "[]");
+        }
+        if (!file_exists(base_path("core/__roles.json"))) {
+            file_put_contents(base_path("core/__roles.json"), '["Administrator"]');
+        }
+    }
+
+
     public static function makeConfig($config_name, $columns, $type = 'int'): array
     {
         $comments = [];
