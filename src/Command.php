@@ -476,7 +476,7 @@ use Illuminate\Support\Facades\Route;");
             $name = str_replace("_", " ", $commandName);
             $modName = ucwords($name);
             $modName = str_replace(" ", "", $modName);
-            $fileName = $modName . ".php";
+            $fileName = $modName . "Test.php";
 
             $file = file_get_contents(__DIR__ . ("/mods/ModTest.php.txt")); // Example path
             $file = str_replace("demo", $lowerName, $file);
