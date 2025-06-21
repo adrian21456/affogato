@@ -16,15 +16,15 @@ Composer Plugin for Laravel RDBMS Development
    php install:api
    ```
 
-   Add `use HasApiTokens` in App/Models/User.php
+3. Add `use HasApiTokens` in App/Models/User.php
 
-3. Link storage:
+4. Link storage:
 
    ```bash
    php artisan storage:link
    ```
 
-4. Install Laravel Sanctum:
+5. Install Laravel Sanctum:
    ```bash
    composer require laravel/sanctum
    ```
