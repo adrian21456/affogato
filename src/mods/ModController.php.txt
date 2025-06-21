@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Mods;
 
 use App\Http\Controllers\Controller;
-use App\Http\Services\BaseService;
-use App\Http\Services\CRUDService;
+use Zchted\Affogato\BaseService;
+use Zchted\Affogato\CRUDService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
