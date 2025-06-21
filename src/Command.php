@@ -16,7 +16,7 @@ class Command
             }
 
             $columns = self::cleanColumns($columns);
-            $config = json_decode(file_get_contents(base_path("mods/config.json")), true);
+            $config = json_decode(file_get_contents(__DIR__ . "/mods/config.json"), true);
 
             //Change Contents
             $id = $config_name . "_id";
@@ -57,7 +57,7 @@ class Command
             $path = base_path("core/$config_name.json");
             $config = json_decode(file_get_contents($path), true);
             $cols = $config['columns'];
-            $attribute_template = json_decode(file_get_contents(base_path("mods/column_attributes.json")), true);
+            $attribute_template = json_decode(file_get_contents(__DIR__ . ("mods/column_attributes.json")), true);
 
             $found = false;
 
@@ -107,7 +107,7 @@ class Command
             $configPath = base_path("core/$config_name.json");
             $config = json_decode(file_get_contents($configPath), true);
             $cols = $config['columns'];
-            $class_template = json_decode(file_get_contents(base_path("mods/column_class.json")), true);
+            $class_template = json_decode(file_get_contents(__DIR__ . ("/mods/column_class.json")), true);
 
             $found = false;
 
@@ -161,7 +161,7 @@ class Command
             $config = json_decode(file_get_contents($path), true);
             $cols = $config['columns'];
 
-            $validation_template = json_decode(file_get_contents(base_path("mods/column_validation.json")), true);
+            $validation_template = json_decode(file_get_contents(__DIR__ . ("/mods/column_validation.json")), true);
 
             $found = false;
 
@@ -242,7 +242,7 @@ class Command
     private static function columnGenerator($column_name, $type = 'string', $key = '')
     {
         try {
-            $column = json_decode(file_get_contents(base_path("mods/column.json")), true);
+            $column = json_decode(file_get_contents(__DIR__ . ("/mods/column.json")), true);
             $proper_name = properName($column_name);
 
             $column['type'] = $type;
@@ -344,7 +344,7 @@ class Command
             if (file_exists(app_path("Models/Mods/$fileName")) && !$force) {
                 echo "MOD: $modName already exists" . PHP_EOL;
             } else {
-                $file = empty($data) ? file_get_contents(base_path("mods/ModModel.php.txt")) : $data; // Example path
+                $file = empty($data) ? file_get_contents(__DIR__ . ("/mods/ModModel.php.txt")) : $data; // Example path
                 $file = str_replace("demo", $lowerName, $file);
                 $file = str_replace("Demo", $modName, $file);
                 $file = str_ireplace("ModMod", "Mod", $file);
@@ -363,7 +363,7 @@ class Command
             if (file_exists(app_path("Models/$fileName"))) {
                 //                echo "Model: $modName already exists" . PHP_EOL;
             } else {
-                $file = file_get_contents(base_path("mods/Model.php.txt")); // Example path
+                $file = file_get_contents(__DIR__ . ("/mods/Model.php.txt")); // Example path
                 $file = str_replace("demo", $lowerName, $file);
                 $file = str_replace("Demo", $modName, $file);
                 $file = str_ireplace("ModMod", "Mod", $file);
@@ -386,7 +386,7 @@ class Command
             if (file_exists(app_path("Http/Controllers/Mods/$fileName"))) {
                 //                echo "MOD: $controllerName already exists" . PHP_EOL;
             } else {
-                $file = file_get_contents(base_path("mods/ModController.php.txt")); // Example path
+                $file = file_get_contents(__DIR__ . ("/mods/ModController.php.txt")); // Example path
                 $file = str_replace("demo", $lowerName, $file);
                 $file = str_replace("ModDemo", $modName, $file);
                 $file = str_replace("Demo", $properName, $file);
@@ -412,7 +412,7 @@ class Command
             if (file_exists(app_path("Http/Controllers/api/$fileName"))) {
                 //                echo "MOD: $controllerName already exists" . PHP_EOL;
             } else {
-                $file = file_get_contents(base_path("mods/Controller.php.txt")); // Example path
+                $file = file_get_contents(__DIR__ . ("/mods/Controller.php.txt")); // Example path
                 $file = str_replace("demo", $lowerName, $file);
                 $file = str_replace("ModDemo", $extraModName, $file);
                 $file = str_replace("Demo", $properName, $file);
@@ -423,7 +423,7 @@ class Command
             }
 
             //Create Routes
-            $routes = file_get_contents(base_path("mods/Routes.txt"));
+            $routes = file_get_contents(__DIR__ . ("/mods/Routes.txt"));
             $routes = str_replace("demo", $lowerName, $routes);
             $routes = str_replace("Demo", $properName, $routes);
             $routes_file = file_get_contents(base_path("routes/mods.php"));
@@ -523,7 +523,7 @@ class Command
     {
         $log = [];
         try {
-            $file = file_get_contents(base_path("mods/ModModel.php.txt"));
+            $file = file_get_contents(__DIR__ . ("/mods/ModModel.php.txt"));
 
             if (!$config['soft_delete']) {
                 $file = str_replace("use SoftDeletes;", "", $file);

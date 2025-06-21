@@ -1,0 +1,29 @@
+{
+    "name": "demo_name",
+    "type": "string",
+    "control": "text",
+    "fillable": true,
+    "nullable": true,
+    "length": null,
+    "default": "",
+    "primary": false,
+    "foreign": false,
+    "options": [],
+    "required": true,
+    "unique": false,
+    "file_types": "",
+    "ui": {
+        "default": {
+            "validations": [],
+            "classes": [],
+            "attributes": [],
+            "table_context": [],
+            "form_context": [],
+            "grid_size": 12,
+            "table_label": "Demo Name",
+            "form_label": "Demo Name",
+            "extra_label": ""
+        }
+    },
+    "context": []
+}

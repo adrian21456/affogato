@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Models\Mods;
+
+use Zchted\Affogato\AffogatoModel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+{{imports}}
+
+abstract class ModDemo extends AffogatoModel
+{
+
+    use HasFactory;
+    use SoftDeletes;
+
+    public $primaryKey = '{{pk_column}}';
+    public $table = '{{table}}';
+    public $timestamps = {{timestamps}};
+
+    public $fillable = [{{fillables}}];
+
+    public $casts = [{{casts}}];
+
+    public array $nullable = [{{nullables}}];
+
+    public array $enumerable = [{{enumerables}}];
+
+    public array $files = [{{files}}];
+
+    public array $lengths = [{{lengths}}];
+
+    public array $defaults = [{{defaults}}];
+
+    {{attributes}}
+
+    {{relationship}}
+
+}

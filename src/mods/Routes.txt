@@ -1,0 +1,7 @@
+use App\Http\Controllers\Api\DemoController;
+Route::get('demo', [DemoController::class, 'index']);
+Route::post('/demo/search', [DemoController::class, 'search']);
+Route::get('demo/{item}', [DemoController::class, 'show']);
+Route::post('demo', [DemoController::class, 'store']);
+Route::post('/demo/{item}', [DemoController::class, 'update']);
+Route::delete('demo/{item}', [DemoController::class, 'destroy']);
