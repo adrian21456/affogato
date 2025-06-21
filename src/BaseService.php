@@ -13,7 +13,7 @@ class BaseService
         AuditLog::create([
             'module' => getModuleName(__CLASS__),
             'action' => getActionName(__FUNCTION__),
-            'user_id' => auth()->id() ?? null,
+            'user_id' => auth()->id() ?? 1,
         ]);
     }
 
