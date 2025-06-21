@@ -17,8 +17,9 @@ Route::middleware(['auth:sanctum', ExpireSanctumTokens::class, ForceJsonResponse
         return $request->user();
     });
 
-    require("mods.php");
-
+    if (file_exists(__DIR__ . '/mods.php')) {
+        require __DIR__ . '/mods.php';
+    }
 
     // Logout
     Route::post('/logout', [LoginController::class, 'logout']);
