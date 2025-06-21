@@ -6,7 +6,10 @@
   "autoload": {
     "psr-4": {
       "Zchted\\Affogato\\": "src/"
-    }
+    },
+    "files": [
+      "src/helpers.php"
+    ]
   },
   "authors": [
     {
