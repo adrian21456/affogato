@@ -64,9 +64,32 @@ Composer Plugin for Laravel RDBMS Development
    }
    ```
 
-5. **Add `mods/bootstrap.txt` to `bootstrap/app.php`**
+5. **Add `Register Middleware and Exception Handler` to `bootstrap/app.php`**
 
-   Load or require the `mods/bootstrap.txt` if needed for boot logic.
+   ```php
+   <?php
+
+    use Illuminate\Foundation\Application;
+    use Illuminate\Foundation\Configuration\Exceptions;
+    use Illuminate\Foundation\Configuration\Middleware;
+
+    return Application::configure(basePath: dirname(__DIR__))
+        ->withRouting(
+            web: __DIR__.'/../routes/web.php',
+            api: __DIR__.'/../routes/api.php',
+            commands: __DIR__.'/../routes/console.php',
+            health: '/up',
+        )
+        ->withMiddleware(function (Middleware $middleware) {
+            /* Register Middlewares */
+            $middleware->append(\Zchted\Affogato\ExpireSanctumTokens::class);
+            $middleware->append(\Zchted\Affogato\ForceJsonResponse::class);
+        })
+        ->withExceptions(function (Exceptions $exceptions): void {
+            /* Register Exception Handler */
+            handleExceptions($exceptions);
+        })->create();
+   ```
 
 6. **Copy `mods/api.php` to `routes/api.php`**
 

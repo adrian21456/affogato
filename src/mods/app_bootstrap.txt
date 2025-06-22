@@ -1,63 +1,22 @@
 <?php
 
-use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Configuration\Exceptions;
-use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+    use Illuminate\Foundation\Application;
+    use Illuminate\Foundation\Configuration\Exceptions;
+    use Illuminate\Foundation\Configuration\Middleware;
 
-return Application::configure(basePath: dirname(__DIR__))
-    ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        api: __DIR__.'/../routes/api.php',
-        commands: __DIR__.'/../routes/console.php',
-        health: '/up',
-    )
-    /* Copy Start */
-    ->withMiddleware(function (Middleware $middleware) {
-        $middleware->append(\Zchted\Affogato\ExpireSanctumTokens::class);
-        $middleware->append(\Zchted\Affogato\ForceJsonResponse::class);
-
-    })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->reportable(function (\Throwable $exception) {
-            Log::error('Exception occurred', [
-                'exception' => [
-                    'name'    => get_class($exception),
-                    'code'    => $exception->getCode(),
-                    'message' => $exception->getMessage(),
-                    'line'    => $exception->getLine(),
-                    'file'    => $exception->getFile(),
-                    'trace'   => $exception->getTrace(),
-                ]
-            ]);
-        });
-
-        $exceptions->renderable(function (\Throwable $exception, Request $request) {
-            $response = [
-                'status' => false,
-                'version' => env('APP_VERSION'),
-                'timestamp' => time(),
-                'timezone' => date_default_timezone_get(),
-                'message' => $exception->getMessage(),
-                'error' => [
-                    'name'    => get_class($exception),
-                    'code'    => $exception->getCode(),
-                    'message' => $exception->getMessage(),
-                    'line'    => $exception->getLine(),
-                    'file'    => $exception->getFile(),
-                    'trace'   => $exception->getTrace(),
-                ],
-                'request' => $request->all(),
-            ];
-
-            if(env('APP_ENV') !== 'local'){
-                unset($response['error']['file']);
-                unset($response['error']['line']);
-                unset($response['error']['trace']);
-                unset($response['request']);
-            }
-            return response()->json($response, ($exception->getCode() === 0) ? 500 : $exception->getCode()); // You can modify the status code based on the exception type
-        });
-    /* Copy End */
-    })->create();
+    return Application::configure(basePath: dirname(__DIR__))
+        ->withRouting(
+            web: __DIR__.'/../routes/web.php',
+            api: __DIR__.'/../routes/api.php',
+            commands: __DIR__.'/../routes/console.php',
+            health: '/up',
+        )
+        ->withMiddleware(function (Middleware $middleware) {
+            /* Register Middlewares */
+            $middleware->append(\Zchted\Affogato\ExpireSanctumTokens::class);
+            $middleware->append(\Zchted\Affogato\ForceJsonResponse::class);
+        })
+        ->withExceptions(function (Exceptions $exceptions): void {
+            /* Register Exception Handler */
+            handleExceptions($exceptions);
+        })->create();
