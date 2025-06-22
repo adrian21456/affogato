@@ -3,6 +3,7 @@
 use Doctrine\Inflector\InflectorFactory;
 use GuzzleHttp\Psr7\UploadedFile;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
 
 function getModuleName($controllerName): string
 {
@@ -199,4 +200,47 @@ function assertValidApiResponse($response, $keywords = ['error', 'fail', 'except
             "Response contains the keyword '{$keyword}'."
         );
     }
+}
+
+function handleExceptions($exceptions)
+{
+    $exceptions->reportable(function (\Throwable $exception) {
+        Log::error('Exception occurred', [
+            'exception' => [
+                'name' => get_class($exception),
+                'code' => $exception->getCode(),
+                'message' => $exception->getMessage(),
+                'line' => $exception->getLine(),
+                'file' => $exception->getFile(),
+                'trace' => $exception->getTrace(),
+            ]
+        ]);
+    });
+
+    $exceptions->renderable(function (\Throwable $exception, Request $request) {
+        $response = [
+            'status' => false,
+            'version' => env('APP_VERSION'),
+            'timestamp' => time(),
+            'timezone' => date_default_timezone_get(),
+            'message' => $exception->getMessage(),
+            'error' => [
+                'name' => get_class($exception),
+                'code' => $exception->getCode(),
+                'message' => $exception->getMessage(),
+                'line' => $exception->getLine(),
+                'file' => $exception->getFile(),
+                'trace' => $exception->getTrace(),
+            ],
+            'request' => $request->all(),
+        ];
+
+        if (env('APP_ENV') !== 'local') {
+            unset($response['error']['file']);
+            unset($response['error']['line']);
+            unset($response['error']['trace']);
+            unset($response['request']);
+        }
+        return response()->json($response, ($exception->getCode() === 0) ? 500 : $exception->getCode()); // You can modify the status code based on the exception type
+    });
 }
