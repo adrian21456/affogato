@@ -2,7 +2,7 @@
 
 Composer Plugin for Laravel RDBMS Development
 
-## 🔧 Laravel Installation
+## 🔧 Laravel 12 Installation
 
 1. Create a new Laravel app:
 
