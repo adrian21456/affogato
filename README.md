@@ -64,7 +64,9 @@ Composer Plugin for Laravel RDBMS Development
    }
    ```
 
-5. **Add `Register Middleware and Exception Handler` to `bootstrap/app.php`**
+5. **Register Middlewares and Exception Handler to `bootstrap/app.php`**
+
+   This is needed to force JSON Response on the APIs.
 
    ```php
    <?php
