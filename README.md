@@ -7,7 +7,7 @@ Composer Plugin for Laravel RDBMS Development
 1. Create a new Laravel app:
 
    ```bash
-   laravel new test-app
+   laravel new affogato
    ```
 
 2. Run the custom API install script:
