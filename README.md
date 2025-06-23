@@ -132,8 +132,3 @@ Composer Plugin for Laravel RDBMS Development
    ```
 
 ---
-
-## ✅ Notes
-
-- Make sure your `app/Http/Kernel.php` has `api` middleware properly set.
-- If using broadcasting, register event and channel files as needed.
