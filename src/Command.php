@@ -391,8 +391,6 @@ use Illuminate\Support\Facades\Route;");
 
             //Create Mod Model
             if (file_exists(app_path("Models/Mods/$fileName")) && !$force) {
-                echo "MOD: $modName already exists" . PHP_EOL;
-            } else {
                 $file = empty($data) ? file_get_contents(__DIR__ . ("/mods/ModModel.php.txt")) : $data; // Example path
                 $file = str_replace("demo", $lowerName, $file);
                 $file = str_replace("Demo", $modName, $file);
@@ -433,8 +431,6 @@ use Illuminate\Support\Facades\Route;");
             $fileName = $controllerName . ".php";
 
             if (file_exists(app_path("Http/Controllers/Mods/$fileName"))) {
-                //                echo "MOD: $controllerName already exists" . PHP_EOL;
-            } else {
                 $file = file_get_contents(__DIR__ . ("/mods/ModController.php.txt")); // Example path
                 $file = str_replace("demo", $lowerName, $file);
                 $file = str_replace("ModDemo", $modName, $file);
