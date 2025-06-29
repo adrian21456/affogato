@@ -16,13 +16,13 @@ abstract class AffogatoController extends BaseController
 
         try {
             // Preload logic
-            $this->preload($method);
+            $this->preload($method, $parameters);
 
             // Call the actual method of the controller
             $result = parent::callAction($method, $parameters);
 
             // Postload logic
-            $this->postload($method);
+            $this->postload($method, $parameters);
 
             // Return response
             return getResponseObject($result, $request->all());
@@ -36,11 +36,11 @@ abstract class AffogatoController extends BaseController
      * @return void
      * Scripts to run before method calls
      */
-    public function preload($method) {}
+    public function preload($method, $parameters) {}
 
     /**
      * @return void
      * Scripts to run after method calls
      */
-    public function postload($method) {}
+    public function postload($method, $parameters) {}
 }
