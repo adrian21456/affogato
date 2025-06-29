@@ -20,15 +20,7 @@ beforeEach(function () {
 });
 
 it('can create a demo', function () {
-    $start = microtime(true);
-
-    $response = $this->postJson('/api/demo', $this->payload)->assertOk();
-
-    assertDurationLessThan($start, 'Create');
-    assertValidApiResponse($response);
-
-    $pk_value = $response->json()['result']['demo_id'];
-    expect($pk_value)->toBeInt();
+    expect(test()->pk_value)->toBeInt();
 });
 
 it('can list demo', function () {
