@@ -8,7 +8,7 @@ use Zchted\Affogato\CRUDService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
-abstract class ModDemoController extends Controller
+class ModDemoController extends Controller
 {
     protected CRUDService $crudService;
     protected Model $model;
