@@ -143,7 +143,7 @@ class CRUDService
         ]));
 
         $data_before = $item->toArray();
-        $validated = $this->handleFiles($request, $validated);
+        $validated = $this->handleFiles($request, $validated, true);
 
         $item->fill($validated);
         $item->save();
@@ -180,7 +180,7 @@ class CRUDService
         ];
     }
 
-    private function handleFiles(Request $request, $validated = [])
+    private function handleFiles(Request $request, $validated = [], $updateLogic = false)
     {
         $uploadedFiles = [];
 
@@ -188,13 +188,39 @@ class CRUDService
 
         foreach ($modelFiles as $key => $value) {
             if ($request->has($key)) {
+
+                if ($updateLogic) {
+                    $uploadedFiles = $this->model->findOrFail($request->item)[$key];
+                }
+
                 $files = $request->file($key);
+
+                if (empty($files)) {
+                    $files = $request->input($key);
+                }
 
                 if (!is_array($files)) {
                     $files = [$files];
                 }
 
+                if ($updateLogic && count($files) > 0) {
+                    if (is_string($files[0])) {
+                        $uploadedFiles = [];
+                    }
+                }
+
                 foreach ($files as $file) {
+                    if (is_string($file)) {
+                        if ($updateLogic) { //file array is to be updated anew
+                            $uploadedFiles[] = $file;
+                            $validated[$key] = $uploadedFiles;
+                            continue;
+                        }
+                    }
+
+                    if ($updateLogic) {
+                    }
+
                     $filename = str_replace('.' . $file->getClientOriginalExtension(), "", $file->getClientOriginalName()) . getFileSuffix() . '.' . $file->getClientOriginalExtension();
                     $filePath = BaseService::saveFile($file, $filename);
                     $uploadedFiles[] = $filePath;
