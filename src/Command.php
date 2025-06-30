@@ -432,16 +432,14 @@ use Illuminate\Support\Facades\Route;");
             $controllerName = $modName . "Controller";
             $fileName = $controllerName . ".php";
 
-            if (file_exists(app_path("Http/Controllers/Mods/$fileName"))) {
-                $file = file_get_contents(__DIR__ . ("/mods/ModController.php.txt")); // Example path
-                $file = str_replace("demo", $lowerName, $file);
-                $file = str_replace("ModDemo", $modName, $file);
-                $file = str_replace("Demo", $properName, $file);
-                $file = str_ireplace("ModMod", "Mod", $file);
+            $file = file_get_contents(__DIR__ . ("/mods/ModController.php.txt")); // Example path
+            $file = str_replace("demo", $lowerName, $file);
+            $file = str_replace("ModDemo", $modName, $file);
+            $file = str_replace("Demo", $properName, $file);
+            $file = str_ireplace("ModMod", "Mod", $file);
 
-                file_put_contents(app_path("Http/Controllers/Mods/$fileName"), $file);
-                echo "MOD: $controllerName has been created in app/Http/Controllers/Mods" . PHP_EOL;
-            }
+            file_put_contents(app_path("Http/Controllers/Mods/$fileName"), $file);
+            echo "MOD: $controllerName has been created in app/Http/Controllers/Mods" . PHP_EOL;
 
             //Create Main Controller
             $lowerName = strtolower($commandName);
