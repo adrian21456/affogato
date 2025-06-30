@@ -391,6 +391,8 @@ use Illuminate\Support\Facades\Route;");
 
             //Create Mod Model
             if (file_exists(app_path("Models/Mods/$fileName")) && !$force) {
+                //Do nothing
+            } else {
                 $file = empty($data) ? file_get_contents(__DIR__ . ("/mods/ModModel.php.txt")) : $data; // Example path
                 $file = str_replace("demo", $lowerName, $file);
                 $file = str_replace("Demo", $modName, $file);
