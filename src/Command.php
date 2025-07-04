@@ -53,6 +53,10 @@ use Illuminate\Support\Facades\Route;");
         if (!file_exists(base_path("database/migrations/___create_audit_log___.php"))) {
             copy(__DIR__ . "/mods/___create_audit_log___.php", base_path("database/migrations/___create_audit_log___.php"));
         }
+
+        if (!file_exists(base_path("database/migrations/___update_users___.php"))) {
+            copy(__DIR__ . "/mods/___update_users___.php", base_path("database/migrations/___update_users___.php"));
+        }
     }
 
 
