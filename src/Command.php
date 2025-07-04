@@ -1315,11 +1315,16 @@ $fieldsCode
 
         foreach ($sortedConfigs as $configName) {
             $modelClass = 'App\\Models\\' . Str::studly($configName);
+            $config = json_decode(file_get_contents(base_path("core/$configName.json")), true);
+            $seed = 10;
+            if (array_key_exists('seed', $config)) {
+                $seed = intval($config['seed']);
+            }
 
             if (class_exists($modelClass)) {
                 if ($modelClass::count() === 0) {
-                    $modelClass::factory()->count(intval(env("SEEDER_COUNT", "10")))->create();
-                    $command->info("✅Seeded: $modelClass");
+                    $modelClass::factory()->count($seed)->create();
+                    $command->info("✅Seeded $seed entries: $modelClass");
                 } else {
                     $command->info("ℹ️Already seeded: $modelClass");
                 }
