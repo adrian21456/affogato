@@ -1055,7 +1055,7 @@ class $factoryClass extends Factory
                 $extension = strtolower(trim($fileTypes[0]));
 
                 // 🔑 Use generateFakeFile function
-                $fieldMappings[] = "            '$field' => generateFakeFile('{$extension}'),";
+                $fieldMappings[] = "            '$field' => [generateFakeFile('{$extension}')],";
                 continue;  // 🔑 Skip default faker mapping
             }
 

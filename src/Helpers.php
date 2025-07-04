@@ -254,7 +254,7 @@ if (!function_exists('generateFakeFile')) {
         $extension = strtolower($extension);
 
         // Path to your package's /faker folder
-        $fakerPath = base_path(__DIR__ . '/faker');
+        $fakerPath = __DIR__ . '/faker';
         $fileName = "fake.{$extension}";
         $fullPath = $fakerPath . DIRECTORY_SEPARATOR . $fileName;
 
@@ -262,8 +262,11 @@ if (!function_exists('generateFakeFile')) {
 
         // ✅ If file exists in /faker, use it
         if (file_exists($fullPath)) {
+            Log::info("Using existing file: {$fullPath}");
             return Storage::disk('public')->putFileAs($folder, new File($fullPath), $newFileName);
         }
+
+        Log::info("File not found in /faker: {$fullPath}");
 
         // 🔄 Else create dummy content and save as temporary file
         $fakeContent = fake()->text(100);  // Random content (not necessarily valid for the extension)
