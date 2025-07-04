@@ -4,6 +4,9 @@ use Doctrine\Inflector\InflectorFactory;
 use GuzzleHttp\Psr7\UploadedFile;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Http\File;
 
 function getModuleName($controllerName): string
 {
@@ -243,4 +246,38 @@ function handleExceptions($exceptions)
         }
         return response()->json($response, ($exception->getCode() === 0) ? 500 : $exception->getCode()); // You can modify the status code based on the exception type
     });
+}
+
+if (!function_exists('generateFakeFile')) {
+    function generateFakeFile(string $extension, string $folder = "files"): ?string
+    {
+        $extension = strtolower($extension);
+
+        // Path to your package's /faker folder
+        $fakerPath = base_path(__DIR__ . '/faker');
+        $fileName = "fake.{$extension}";
+        $fullPath = $fakerPath . DIRECTORY_SEPARATOR . $fileName;
+
+        $newFileName = "fake" . getFileSuffix() . "." . $extension;
+
+        // ✅ If file exists in /faker, use it
+        if (file_exists($fullPath)) {
+            return Storage::disk('public')->putFileAs($folder, new File($fullPath), $newFileName);
+        }
+
+        // 🔄 Else create dummy content and save as temporary file
+        $fakeContent = fake()->text(100);  // Random content (not necessarily valid for the extension)
+
+        $tempPath = storage_path('app/public/temp_fake.' . $extension);
+        file_put_contents($tempPath, $fakeContent);
+
+        $storedPath = Storage::disk('public')->putFileAs($folder, new File($tempPath), $newFileName);
+
+        // 🧹 Delete the temporary file after storing
+        if (file_exists($tempPath)) {
+            @unlink($tempPath);
+        }
+
+        return $storedPath;
+    }
 }

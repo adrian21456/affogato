@@ -1009,7 +1009,6 @@ use Illuminate\Support\Facades\Route;");
 
         $factoryClass = "{$modelName}Factory";
 
-
         $stub = "<?php
 
 namespace Database\Factories;
@@ -1034,6 +1033,7 @@ class $factoryClass extends Factory
 ";
 
         $fieldMappings = [];
+
         foreach ($columns as $column) {
             if ($column['primary'] || in_array($column['name'], ['created_at', 'updated_at'])) {
                 continue;
@@ -1042,12 +1042,28 @@ class $factoryClass extends Factory
             $field = $column['name'];
             $type = $column['type'];
 
-            // Faker logic
+            /**
+             * 🔑 NEW: Handle file and file_multiple controls
+             */
+            if (in_array($column['control'], ['file', 'file_multiple'])) {
+                // 🔑 Split file_types string or default to ['pdf']
+                $fileTypes = !empty($column['file_types'])
+                    ? explode('|', $column['file_types'])
+                    : ['pdf'];
+
+                // 🔑 Use first extension (or randomize here if needed)
+                $extension = strtolower(trim($fileTypes[0]));
+
+                // 🔑 Use generateFakeFile function
+                $fieldMappings[] = "            '$field' => generateFakeFile('{$extension}'),";
+                continue;  // 🔑 Skip default faker mapping
+            }
+
+            // Standard faker logic
             switch ($type) {
                 case 'string':
-                    // Use enum values if available
                     if (!empty($column['options'])) {
-                        $options = array_map(fn($v) => "'$v'", $column['options']); // quote each string
+                        $options = array_map(fn($v) => "'$v'", $column['options']);
                         $faker = '->randomElement([' . implode(', ', $options) . '])';
                         break;
                     }
@@ -1090,7 +1106,6 @@ class $factoryClass extends Factory
                     $faker = '->word()';
             }
 
-            // Foreign key factory relationship
             if ($column['foreign']) {
                 $fieldProper = properName(ucfirst(str_replace('_id', '', $field)));
                 $fieldCode = str_replace(' ', '', properName($fieldProper));
@@ -1103,13 +1118,13 @@ class $factoryClass extends Factory
 
         $filledStub = str_replace('{{FIELDS}}', implode("\n", $fieldMappings), $stub);
 
-        // Save the file
         $outputDir = base_path('database/factories');
         $filePath = "$outputDir/{$factoryClass}.php";
         file_put_contents($filePath, $filledStub);
 
         echo "Factory generated at: $filePath" . PHP_EOL;
     }
+
 
     public static function createMigration($config)
     {
