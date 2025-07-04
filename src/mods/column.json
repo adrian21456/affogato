@@ -5,7 +5,6 @@
   "fillable": true,
   "nullable": true,
   "length": null,
-  "seed": 10,
   "default": "",
   "primary": false,
   "foreign": false,

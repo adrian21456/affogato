@@ -1316,7 +1316,7 @@ $fieldsCode
         foreach ($sortedConfigs as $configName) {
             $modelClass = 'App\\Models\\' . Str::studly($configName);
             $config = json_decode(file_get_contents(base_path("core/$configName.json")), true);
-            $seed = 10;
+            $seed = env('SEEDER_COUNT', 10); // Default seed count
             if (array_key_exists('seed', $config)) {
                 $seed = intval($config['seed']);
             }

@@ -1,22 +1,23 @@
 {
-    "name": "demo",
-    "representative_value": "demo_id",
-    "timestamps": true,
-    "soft_delete": false,
-    "relationship": {},
-    "attributes": {},
-    "ui": {
-        "page_name": "Demo",
-        "actions": true,
-        "top_options": true,
-        "history": false,
-        "filters": false,
-        "upload": false,
-        "add": true,
-        "edit": true,
-        "delete": true,
-        "migrations": false,
-        "context": []
-    },
-    "columns": []
+  "name": "demo",
+  "representative_value": "demo_id",
+  "timestamps": true,
+  "soft_delete": false,
+  "seed": 10,
+  "relationship": {},
+  "attributes": {},
+  "ui": {
+    "page_name": "Demo",
+    "actions": true,
+    "top_options": true,
+    "history": false,
+    "filters": false,
+    "upload": false,
+    "add": true,
+    "edit": true,
+    "delete": true,
+    "migrations": false,
+    "context": []
+  },
+  "columns": []
 }
