@@ -20,7 +20,7 @@ beforeEach(function () {
     test()->pk_value = $response['result']['demo_id'];
 });
 
-it('can create a demo', function () {
+it('can create demo', function () {
     expect(test()->pk_value)->toBeInt();
 });
 
@@ -45,16 +45,16 @@ it('can search demo', function () {
     assertDurationLessThan($start, 'Search');
 });
 
-it('can update a demo', function () {
+it('can update demo', function () {
 
-    $updatedPayload = [];
+    $enums = (new \App\Models\Demo)->enumerable;
+
     foreach ($this->payload as $key => $value) {
-        if(is_string($value)) {
+        if(is_string($value) && !array_key_exists($key, $enums)) {
             $value .= 'Updated .';
         }
         $updatedPayload[$key] = $value;
     }
-
     $start = microtime(true);
 
     $this->postJson("/api/demo/" . test()->pk_value, $updatedPayload)
@@ -64,7 +64,7 @@ it('can update a demo', function () {
     assertDurationLessThan($start, 'Update');
 });
 
-it('can delete a demo', function () {
+it('can delete demo', function () {
     $start = microtime(true);
 
     $this->deleteJson("/api/demo/" . test()->pk_value)

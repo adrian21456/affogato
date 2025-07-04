@@ -2,6 +2,7 @@
 
 namespace Zchted\Affogato;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Zchted\Affogato\CRUDEvent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -221,7 +222,28 @@ class CRUDService
                     if ($updateLogic) {
                     }
 
-                    $filename = str_replace('.' . $file->getClientOriginalExtension(), "", $file->getClientOriginalName()) . getFileSuffix() . '.' . $file->getClientOriginalExtension();
+                    $extension = null;
+                    $file_name = null;
+
+
+                    if ($file instanceof UploadedFile) {
+                        $extension = $file->getClientOriginalExtension();
+                        $file_name = $file->getClientOriginalName();
+                    }
+
+                    if (is_string($file)) {
+                        $file_parts = explode('.', $file);
+                        if (count($file_parts) > 1) {
+                            $extension = end($file_parts);
+                        } else {
+                            throw new \Exception('Invalid file extension');
+                        }
+                        $file_name = basename($file);
+                        $uploadedFiles[] = $file;
+                        continue;
+                    }
+
+                    $filename = str_replace('.' . $extension, "", $file_name) . getFileSuffix() . '.' . $extension;
                     $filePath = BaseService::saveFile($file, $filename);
                     $uploadedFiles[] = $filePath;
                 }
