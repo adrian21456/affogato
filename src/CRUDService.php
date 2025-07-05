@@ -190,8 +190,21 @@ class CRUDService
         foreach ($modelFiles as $key => $value) {
             if ($request->has($key)) {
 
-                if ($updateLogic) {
+                $config = json_decode(file_get_contents(base_path('core/' . $this->model->table . '.json')), true);
+                $columns = $config['columns'];
+                $column = [];
+
+                foreach ($columns as $col) {
+                    if ($col['name'] === $key) {
+                        $column = $col;
+                    }
+                }
+
+                if ($updateLogic && $column['control'] === 'file_multiple') {
                     $uploadedFiles = $this->model->findOrFail($request->item)[$key];
+                    if (is_array($request[$key]) && count($request[$key]) === 0) {
+                        $uploadedFiles = [];
+                    }
                 }
 
                 $files = $request->file($key);
@@ -217,9 +230,6 @@ class CRUDService
                             $validated[$key] = $uploadedFiles;
                             continue;
                         }
-                    }
-
-                    if ($updateLogic) {
                     }
 
                     $extension = null;
