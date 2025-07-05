@@ -37,9 +37,10 @@ it('can list demo', function () {
 it('can search demo', function () {
     $start = microtime(true);
 
-    $this->getJson('/api/demo/search')
+    $this->postJson('/api/demo/search', ['demo_id' => test()->pk_value])
         ->assertOk()
         ->assertJsonFragment(['demo_id' => test()->pk_value]);
+
 
     assertDurationLessThan($start, 'Search');
 });
