@@ -74,6 +74,11 @@ function getResponseObject($result = [], $request = [], \Exception $exception = 
         }
     }
 
+    if (!empty($exception)) {
+        $response['status'] = false;
+        abort(500, $exception->getMessage());
+    }
+
     return $response;
 }
 
