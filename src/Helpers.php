@@ -289,3 +289,17 @@ if (!function_exists('generateFakeFile')) {
         return $storedPath;
     }
 }
+
+function extractParameters($parameters)
+{
+    if (isset($parameters[0]) && $parameters[0] instanceof \Illuminate\Http\Request) {
+        $params = $parameters[0]->all();
+        if (array_key_exists('parameters', $params)) {
+            unset($params['parameters']);
+        }
+
+        return $params;
+    }
+
+    return [];
+}
