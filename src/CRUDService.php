@@ -76,6 +76,15 @@ class CRUDService
 
         foreach ($request->all() as $key => $value) {
             if (in_array($key, ['page', 'limit', 'order_by', 'order_direction'])) continue;
+            
+            if ($key === 'queryText') {
+                $fields = $this->model->getFillable();
+                foreach ($fields as $field) {
+                    $query->orWhereRaw("CAST({$field} AS TEXT) LIKE ?", ['%' . $value . '%']);
+                }
+                continue;
+            }
+
             if (!in_array($key, $this->model->getFillable())) continue;
 
             if (is_string($value)) {
