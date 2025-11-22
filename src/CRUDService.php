@@ -271,6 +271,7 @@ class CRUDService
 
                     $filename = str_replace('.' . $extension, "", $file_name) . getFileSuffix() . '.' . $extension;
                     $filePath = BaseService::saveFile($file, $filename);
+                    if(!$filePath) continue;
                     $uploadedFiles[] = $filePath;
                 }
 

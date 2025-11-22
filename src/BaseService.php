@@ -26,6 +26,10 @@ class BaseService
 
     public static function saveFile($file, $filename)
     {
+        if(!$file){
+            return null;
+        }
+        
         $disk = env('FILESYSTEM_DISK', 'public');
         $path = ($disk === 'gcs') ? env('GOOGLE_CLOUD_STORAGE_FOLDER', 'files') : 'files';
 
