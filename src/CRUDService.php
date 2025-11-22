@@ -209,7 +209,10 @@ class CRUDService
                     }
                 }
 
-                if ($updateLogic && $column['control'] === 'file_multiple') {
+                $isUpdatingFileMultiple = $updateLogic && $column['control'] === 'file_multiple';
+
+
+                if ($isUpdatingFileMultiple) {
                     $uploadedFiles = $this->model->findOrFail($request->item)[$key];
                     if (is_array($request[$key]) && count($request[$key]) === 0) {
                         $uploadedFiles = [];
@@ -217,6 +220,10 @@ class CRUDService
                 }
 
                 $files = $request->file($key);
+
+                if($isUpdatingFileMultiple && is_array($files)) {
+                   $files = array_values($files);
+                }
 
                 if (empty($files)) {
                     $files = $request->input($key);
