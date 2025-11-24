@@ -210,16 +210,24 @@ class CRUDService
                 }
 
                 $isUpdatingFileMultiple = $updateLogic && $column['control'] === 'file_multiple';
-
+                $recordFiles = []; //Existing files to be retained
+                $savedFiles = []; //New files stored
+                $namedFiles = []; //String files in the request payload
 
                 if ($isUpdatingFileMultiple) {
                     $uploadedFiles = $this->model->findOrFail($request->item)[$key];
+                    foreach ($uploadedFiles as $file) {
+                        if ($request->input($key) && in_array($file, $request->input($key)) && !in_array($file, $recordFiles)) {
+                            $recordFiles[] = $file;
+                        }
+                    }
                     if (is_array($request[$key]) && count($request[$key]) === 0) {
                         $uploadedFiles = [];
                     }
                 }
 
                 $files = $request->file($key);
+                $namedFiles = $request->input($key) ?? [];
 
                 if($isUpdatingFileMultiple && is_array($files)) {
                    $files = array_values($files);
@@ -272,8 +280,22 @@ class CRUDService
                     $filename = str_replace('.' . $extension, "", $file_name) . getFileSuffix() . '.' . $extension;
                     $filePath = BaseService::saveFile($file, $filename);
                     if(!$filePath) continue;
+                    $savedFiles[] = $filePath;
                     $uploadedFiles[] = $filePath;
                 }
+
+                if ($isUpdatingFileMultiple) {
+                    $uploadedFiles = array_merge($recordFiles, $uploadedFiles);
+                    $tempFiles = [];
+                    foreach($uploadedFiles as $file) {
+                        if(in_array($file, $namedFiles) || in_array($file, $savedFiles)) {
+                            $tempFiles[] = $file;
+                        }
+                    }
+                    $uploadedFiles = $tempFiles;
+                }
+
+                $uploadedFiles = array_values(array_unique($uploadedFiles));
 
                 $validated[$key] = $uploadedFiles;
                 $uploadedFiles = [];
