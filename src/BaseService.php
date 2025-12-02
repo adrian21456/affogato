@@ -51,7 +51,7 @@ class BaseService
         $value = $Request->input('value', $model->table . "_id");
         $label = $Request->input('label', $config['representative_value']);
 
-        $items = $model::query([$value, $label])->get();
+        $items = $model::select([$value, $label])->get();
         $dropdownItems = [];
 
         foreach ($items as $item) {
@@ -61,6 +61,9 @@ class BaseService
             ];
         }
 
-        return $dropdownItems;
+        return [
+            "message" => "Dropdown Options were successfully retrieved",
+            "result" => $dropdownItems
+        ];
     }
 }
