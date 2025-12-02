@@ -63,4 +63,10 @@ class ModDemoController extends Controller
         BaseService::requestValidator(request(), $rules);
         return $this->crudService->destroy($item);
     }
+
+    // GET /api/demo/dropdown
+    public function getDropdownItems(Request $request): array
+    {
+        return BaseService::getDropdownItems($request, $this->model);
+    }
 }

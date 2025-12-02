@@ -1,5 +1,6 @@
 use App\Http\Controllers\Api\DemoController;
 Route::get('demo', [DemoController::class, 'index']);
+Route::get('demo/dropdown', [DemoController::class, 'getDropdownItems']);
 Route::post('/demo/search', [DemoController::class, 'search']);
 Route::get('demo/{item}', [DemoController::class, 'show']);
 Route::post('demo', [DemoController::class, 'store']);
