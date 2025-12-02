@@ -49,7 +49,7 @@ class BaseService
     {
         $config = getConfig($model->table);
         $value = $Request->input('value', $model->table . "_id");
-        $label = $Request->input('label', $config->representative_value);
+        $label = $Request->input('label', $config['representative_value']);
 
         $items = $model::query([$value, $label])->get();
         $dropdownItems = [];
