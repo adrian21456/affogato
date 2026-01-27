@@ -88,7 +88,7 @@ class AffogatoModel extends Model
 
                 $column = getColumn($this->table, $field);
 
-                if ($column['control'] === 'file') {
+                if ($column['frontend']['form_control'] === 'file') {
                     if ($this->files[$field] === '*' || empty($this->files[$field])) {
                         $rules[$field] .= '|nullable';
                     } else {
@@ -96,7 +96,7 @@ class AffogatoModel extends Model
                     }
                 }
 
-                if ($column['control'] === 'file_multiple') {
+                if ($column['frontend']['form_control'] === 'file_multiple') {
                     if ($this->files[$field] === '*' || empty($this->files[$field])) {
                         $rules[$field . ".*"] = 'sometimes';
                     } else {

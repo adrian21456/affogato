@@ -103,162 +103,6 @@ use Illuminate\Support\Facades\Route;");
         }
     }
 
-    public static function makeAttribute($config_name, $__column): array
-    {
-        $comments = [];
-        try {
-            $path = base_path("core/$config_name.json");
-            $config = json_decode(file_get_contents($path), true);
-            $cols = $config['columns'];
-            $attribute_template = json_decode(file_get_contents(__DIR__ . ("mods/column_attributes.json")), true);
-
-            $found = false;
-
-            foreach ($cols as $index => $column) {
-                if ($column['name'] === $__column) {
-                    $found = true;
-
-                    // Ensure nesting exists
-                    if (!isset($column['ui'])) $column['ui'] = [];
-                    if (!isset($column['ui']['default'])) $column['ui']['default'] = [];
-                    if (!isset($column['ui']['default']['attributes'])) $column['ui']['default']['attributes'] = [];
-
-                    $attributes = $column['ui']['default']['attributes'];
-
-                    if (in_array($attribute_template, $attributes)) {
-                        throw new \Exception("An attribute template already exists.");
-                    }
-
-                    // Append attribute
-                    $column['ui']['default']['attributes'][] = $attribute_template;
-                    $cols[$index] = $column;
-                    break;
-                }
-            }
-
-            if (!$found) {
-                throw new \Exception("Column '$__column' not found in configuration.");
-            }
-
-            $config['columns'] = $cols;
-
-            self::backupConfig($config_name);
-            file_put_contents($path, json_encode($config, JSON_PRETTY_PRINT));
-
-            echo "Attribute template added to '{$__column}' in '{$config_name}.json'." . PHP_EOL;
-        } catch (\Exception $e) {
-            echo "Failed to update column '{$__column}' in '{$config_name}.json': " . $e->getMessage() . PHP_EOL;
-        } finally {
-            return $comments;
-        }
-    }
-
-    public static function makeClass($config_name, $__column): array
-    {
-        $comments = [];
-        try {
-            $configPath = base_path("core/$config_name.json");
-            $config = json_decode(file_get_contents($configPath), true);
-            $cols = $config['columns'];
-            $class_template = json_decode(file_get_contents(__DIR__ . ("/mods/column_class.json")), true);
-
-            $found = false;
-
-            foreach ($cols as $index => $column) {
-                if ($column['name'] === $__column) {
-                    $found = true;
-
-                    // Ensure nesting exists
-                    if (!isset($column['ui'])) $column['ui'] = [];
-                    if (!isset($column['ui']['default'])) $column['ui']['default'] = [];
-                    if (!isset($column['ui']['default']['classes'])) $column['ui']['default']['classes'] = [];
-
-                    $classes = $column['ui']['default']['classes'];
-
-                    // Prevent duplicate
-                    if (in_array($class_template, $classes)) {
-                        throw new \Exception("A class template already exists.");
-                    }
-
-                    // Add the class template
-                    $column['ui']['default']['classes'][] = $class_template;
-                    $cols[$index] = $column;
-                    break;
-                }
-            }
-
-            if (!$found) {
-                throw new \Exception("Column '$__column' not found in configuration.");
-            }
-
-            $config['columns'] = $cols;
-
-            // Backup and save
-            self::backupConfig($config_name);
-            file_put_contents($configPath, json_encode($config, JSON_PRETTY_PRINT));
-
-            echo "Class template added to '{$__column}' in '{$config_name}.json'." . PHP_EOL;
-        } catch (\Exception $e) {
-            echo "Failed to update column '{$__column}' in '{$config_name}.json': " . $e->getMessage() . PHP_EOL;
-        } finally {
-            return $comments;
-        }
-    }
-
-
-    public static function makeValidation($config_name, $__column): array
-    {
-        $comments = [];
-        try {
-            $path = base_path("core/$config_name.json");
-            $config = json_decode(file_get_contents($path), true);
-            $cols = $config['columns'];
-
-            $validation_template = json_decode(file_get_contents(__DIR__ . ("/mods/column_validation.json")), true);
-
-            $found = false;
-
-            foreach ($cols as $index => $column) {
-                if ($column['name'] === $__column) {
-                    $found = true;
-
-                    // Ensure the 'ui.default.validations' path exists
-                    if (!isset($column['ui'])) $column['ui'] = [];
-                    if (!isset($column['ui']['default'])) $column['ui']['default'] = [];
-                    if (!isset($column['ui']['default']['validations'])) $column['ui']['default']['validations'] = [];
-
-                    // Prevent duplicate validation templates
-                    if (in_array($validation_template, $column['ui']['default']['validations'])) {
-                        throw new \Exception("A validation template already exists.");
-                    }
-
-                    // Append the validation
-                    $column['ui']['default']['validations'][] = $validation_template;
-
-                    $cols[$index] = $column;
-                    break;
-                }
-            }
-
-            if (!$found) {
-                throw new \Exception("Column '$__column' not found in configuration.");
-            }
-
-            $config['columns'] = $cols;
-
-            // Backup and save
-            self::backupConfig($config_name);
-            file_put_contents($path, json_encode($config, JSON_PRETTY_PRINT));
-
-            echo "Validation template added to '{$__column}' in '{$config_name}.json'." . PHP_EOL;
-        } catch (\Exception $e) {
-            echo "Failed to update column '{$__column}' in '{$config_name}.json': " . $e->getMessage() . PHP_EOL;
-        } finally {
-            return $comments;
-        }
-    }
-
-
     public static function deleteColumns($config_name, $columns): array
     {
         $comments = [];
@@ -298,39 +142,44 @@ use Illuminate\Support\Facades\Route;");
             $column = json_decode(file_get_contents(__DIR__ . ("/mods/column.json")), true);
             $proper_name = properName($column_name);
 
-            $column['type'] = $type;
-            $column['ui']['default']['table_label'] = rtrim($proper_name, " Id");
-            $column['ui']['default']['form_label'] =  rtrim($proper_name, " Id");
+            $column['backend']['type'] = $type;
+            $column['backend']['name'] = $column_name;
+            $column['frontend']['table']['label'] = rtrim($proper_name, " Id");
+            $column['frontend']['table']['key'] = $column_name;
+            $column['frontend']['text']['label'] = rtrim($proper_name, " Id");
+            $column['frontend']['view']['label'] = rtrim($proper_name, " Id");
+            $column['frontend']['view']['key'] = $column_name;
             $column['name'] = $column_name;
 
             if ($key === 'primary') {
-                $column['primary'] = true;
-                $column['fillable'] = false;
-                $column['nullable'] = false;
-                $column['ui']['default']['hidden'] = true;
-                $column['type'] = 'int';
+                $column['backend']['primary'] = true;
+                $column['backend']['fillable'] = false;
+                $column['backend']['nullable'] = false;
+                $column['frontend']['display']['form'] = false;
+                $column['frontend']['display']['table'] = false;
+                $column['backend']['type'] = 'int';
             }
 
             if ($key === 'foreign') {
-                $column['foreign'] = true;
-                $column['nullable'] = false;
-                $column['type'] = 'int';
+                $column['backend']['foreign'] = true;
+                $column['backend']['nullable'] = false;
+                $column['backend']['type'] = 'int';
             }
 
             if ($type === 'file') {
-                $column['type'] = 'string';
-                $column['control'] = 'file';
+                $column['backend']['type'] = 'string';
+                $column['frontend']['form_control'] = 'file';
             }
 
             if ($type === 'file_multiple') {
-                $column['type'] = 'string';
-                $column['control'] = 'file_multiple';
+                $column['backend']['type'] = 'string';
+                $column['frontend']['form_control'] = 'file_multiple';
             }
 
             if (in_array($column_name, self::$special_columns)) {
-                $column['required'] = false;
-                $column['nullable'] = false;
-                $column['fillable'] = false;
+                $column['backend']['required'] = false;
+                $column['backend']['nullable'] = false;
+                $column['backend']['fillable'] = false;
             }
             return $column;
         } catch (\Exception $e) {
@@ -548,7 +397,7 @@ use Illuminate\Support\Facades\Route;");
                     $config = self::cleanConfig($config);
 
                     foreach ($config['columns'] as $column) {
-                        if ($column['foreign']) {
+                        if ($column['backend']['foreign']) {
                             self::fillRelationship($config['name'] . "_id", $column['name']);
                         }
                     }
@@ -598,7 +447,7 @@ use Illuminate\Support\Facades\Route;");
             //Get Primary Key
             $primary_key = "";
             foreach ($config['columns'] as $column) {
-                if ($column['primary']) {
+                if ($column['backend']['primary']) {
                     $primary_key = $column['name'];
                     break;
                 }
@@ -617,14 +466,14 @@ use Illuminate\Support\Facades\Route;");
             $defaults = [];
 
             foreach ($config['columns'] as $column) {
-                if ($column['fillable']) $fillables[] = $column['name'];
-                if ($column['nullable']) $nullables[] = $column['name'];
-                if (!empty($column['options'])) $enumerables[$column['name']] = $column['options'];
-                if (str_contains($column['control'], 'file')) $files[$column['name']] = $column['file_types'];
-                if (!empty($column['length'])) $lengths[$column['name']] = $column['length'];
-                if (!empty($column['default'])) $defaults[$column['name']] = $column['default'];
-                if (!in_array($column['name'], self::$special_columns)) $casts[$column['name']] = $column['type'];
-                if (str_contains($column['control'], 'file')) $casts[$column['name']] = "array";
+                if ($column['backend']['fillable']) $fillables[] = $column['name'];
+                if ($column['backend']['nullable']) $nullables[] = $column['name'];
+                if (!empty($column['backend']['options'])) $enumerables[$column['name']] = $column['backend']['options'];
+                if (str_contains($column['frontend']['form_control'], 'file')) $files[$column['name']] = $column['backend']['file_types'];
+                if (!empty($column['backend']['length'])) $lengths[$column['name']] = $column['backend']['length'];
+                if (!empty($column['backend']['default'])) $defaults[$column['name']] = $column['backend']['default'];
+                if (!in_array($column['name'], self::$special_columns)) $casts[$column['name']] = $column['backend']['type'];
+                if (str_contains($column['frontend']['form_control'], 'file')) $casts[$column['name']] = "array";
             }
 
             $fillables_code = "";
@@ -877,34 +726,15 @@ use Illuminate\Support\Facades\Route;");
 
             //Check for roles existence
             if (!self::checkRolesExistence($config['ui']['context']))
-                throw new \Exception("Roles not found: " . implode(', ', $config['context']));
-            foreach ($config['columns'] as $column) {
-                if (!self::checkRolesExistence($column['ui']['default']['table_context']))
-                    throw new \Exception("Roles not found: " . implode(', ', $column['table_context']));
-                if (!self::checkRolesExistence($column['ui']['default']['form_context']))
-                    throw new \Exception("Roles not found: " . implode(', ', $column['form_context']));
-
-                foreach ($column['ui']['default']['validations'] as $validation) {
-                    if (!self::checkRolesExistence($validation['context']))
-                        throw new \Exception("Roles not found: " . implode(', ', $validation['context']));
-                }
-                foreach ($column['ui']['default']['classes'] as $class) {
-                    if (!self::checkRolesExistence($class['context']))
-                        throw new \Exception("Roles not found: " . implode(', ', $class['context']));
-                }
-                foreach ($column['ui']['default']['attributes'] as $attribute) {
-                    if (!self::checkRolesExistence($attribute['context']))
-                        throw new \Exception("Roles not found: " . implode(', ', $attribute['context']));
-                }
-            }
+                throw new \Exception("Roles not found: " . implode(', ', $config['ui']['context']));
 
             foreach (self::$special_columns as $special_column) {
                 foreach ($config['columns'] as $key => $column) {
                     if ($column['name'] === $special_column) {
                         unset($config['columns'][$key]);
 
-                        $column['fillable'] = false;
-                        $column['nullable'] = false;
+                        $column['backend']['fillable'] = false;
+                        $column['backend']['nullable'] = false;
                         $config['columns'][] = $column;
                     }
                 }
@@ -1039,35 +869,35 @@ class $factoryClass extends Factory
         $fieldMappings = [];
 
         foreach ($columns as $column) {
-            if ($column['primary'] || in_array($column['name'], ['created_at', 'updated_at'])) {
+            if ($column['backend']['primary'] || in_array($column['name'], ['created_at', 'updated_at'])) {
                 continue;
             }
 
             $field = $column['name'];
-            $type = $column['type'];
+            $type = $column['backend']['type'];
 
             /**
-             * 🔑 NEW: Handle file and file_multiple controls
+             * Handle file and file_multiple controls
              */
-            if (in_array($column['control'], ['file', 'file_multiple'])) {
-                // 🔑 Split file_types string or default to ['pdf']
-                $fileTypes = !empty($column['file_types'])
-                    ? explode('|', $column['file_types'])
+            if (in_array($column['frontend']['form_control'], ['file', 'file_multiple'])) {
+                // Split file_types string or default to ['pdf']
+                $fileTypes = !empty($column['backend']['file_types'])
+                    ? explode('|', $column['backend']['file_types'])
                     : ['pdf'];
 
-                // 🔑 Use first extension (or randomize here if needed)
+                // Use first extension (or randomize here if needed)
                 $extension = strtolower(trim($fileTypes[0]));
 
-                // 🔑 Use generateFakeFile function
+                // Use generateFakeFile function
                 $fieldMappings[] = "            '$field' => [generateFakeFile('{$extension}')],";
-                continue;  // 🔑 Skip default faker mapping
+                continue;  // Skip default faker mapping
             }
 
             // Standard faker logic
             switch ($type) {
                 case 'string':
-                    if (!empty($column['options'])) {
-                        $options = array_map(fn($v) => "'$v'", $column['options']);
+                    if (!empty($column['backend']['options'])) {
+                        $options = array_map(fn($v) => "'$v'", $column['backend']['options']);
                         $faker = '->randomElement([' . implode(', ', $options) . '])';
                         break;
                     }
@@ -1110,7 +940,7 @@ class $factoryClass extends Factory
                     $faker = '->word()';
             }
 
-            if ($column['foreign']) {
+            if ($column['backend']['foreign']) {
                 $fieldProper = properName(ucfirst(str_replace('_id', '', $field)));
                 $fieldCode = str_replace(' ', '', properName($fieldProper));
                 $faker = '=> \\App\\Models\\' . $fieldCode . '::get([\'' . $field . '\'])->random()';
@@ -1144,9 +974,9 @@ class $factoryClass extends Factory
 
         foreach ($columns as $column) {
             $name = $column['name'];
-            $type = $column['type'];
-            $isNullable = $column['nullable'];
-            $isPrimary = $column['primary'];
+            $type = $column['backend']['type'];
+            $isNullable = $column['backend']['nullable'];
+            $isPrimary = $column['backend']['primary'];
 
             // Skip timestamps (handled separately)
             if (in_array($name, ['created_at', 'updated_at']) && $timestamps) continue;
@@ -1273,7 +1103,7 @@ $fieldsCode
                 $dependency = [];
                 $columns = $config['columns'];
                 foreach ($columns as $column) {
-                    if ($column['foreign']) {
+                    if ($column['backend']['foreign']) {
                         $dependency[] = str_replace("_id", "", $column['name']);
                     }
                 }

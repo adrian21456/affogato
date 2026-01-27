@@ -1,29 +1,179 @@
 {
-  "name": "demo_name",
-  "type": "string",
-  "control": "text",
-  "fillable": true,
-  "nullable": true,
-  "length": null,
-  "default": "",
-  "primary": false,
-  "foreign": false,
-  "options": [],
-  "required": true,
-  "unique": false,
-  "file_types": "",
-  "ui": {
-    "default": {
-      "validations": [],
-      "classes": [],
-      "attributes": [],
-      "table_context": [],
-      "form_context": [],
-      "grid_size": 12,
-      "table_label": "Demo Name",
-      "form_label": "Demo Name",
-      "extra_label": ""
+    "name": "demo",
+    "backend": {
+        "name": "demo",
+        "type": "string",
+        "primary": false,
+        "foreign": false,
+        "fillable": true,
+        "nullable": true,
+        "length": null,
+        "default": "",
+        "options": [],
+        "required": true,
+        "unique": false,
+        "file_types": ""
+    },
+    "frontend": {
+        "form_control": "text",
+        "display": {
+            "view": true,
+            "table": true,
+            "form": true
+        },
+        "text": {
+            "label": "",
+            "caption": "",
+            "description": "",
+            "defaultValue": null
+        },
+        "attributes": {
+            "readonly": false,
+            "disabled": false
+        },
+        "layout": {
+            "type": "top",
+            "weight": 6,
+            "icon": "fa-user",
+            "text": null
+        },
+        "classes": {
+            "label": "",
+            "input": "",
+            "container": "",
+            "caption": "",
+            "error": "",
+            "view_label": "",
+            "view_value": ""
+        },
+        "table": {
+            "key": "demo",
+            "label": "Demo",
+            "value_type": "text",
+            "visible": true,
+            "sortable": true,
+            "searchable": true,
+            "hideable": true
+        },
+        "view": {
+            "key": "demo",
+            "label": "Demo",
+            "view_type": "text",
+            "alignment": "left",
+            "section": "default",
+            "input_type": "textfield"
+        },
+        "controlSettings": {
+            "text": {},
+            "email": {
+                "emailAllowedDomains": ["gmail.com", "outlook.com", "company.com"]
+            },
+            "password": {
+                "passwordStrengthRequirements": {
+                    "minLength": 8,
+                    "requireUppercase": true,
+                    "requireLowercase": true,
+                    "requireNumbers": true,
+                    "requireSymbols": true
+                },
+                "passwordShowStrengthIndicator": true
+            },
+            "number": {
+                "numberMin": 0,
+                "numberMax": 100,
+                "numberStep": 1
+            },
+            "select": {
+                "selectOptions": [
+                    { "value": null, "label": "Please select" }
+                ],
+                "selectSearchable": true,
+                "selectClearable": true,
+                "selectSorted": false,
+                "selectSortDirection": "ascending",
+                "selectOtherOption": false,
+                "selectOtherOptionLabel": "Other (specify)"
+            },
+            "multiselect": {
+                "multiSelectOptions": [
+                    { "value": null, "label": "Please select" }
+                ],
+                "multiSelectSearchable": true,
+                "multiSelectClearable": true,
+                "multiSelectSorted": false,
+                "multiSelectSortDirection": "ascending",
+                "multiSelectMinSelections": 1,
+                "multiSelectMaxSelections": 5
+            },
+            "radio": {
+                "radioOptions": [
+                    { "value": null, "label": "Please select" }
+                ]
+            },
+            "checkbox": {
+                "checkboxCheckedValue": true,
+                "checkboxUncheckedValue": false
+            },
+            "checkbox_group": {
+                "checkboxGroupOptions": [
+                    { "value": null, "label": "Please select" }
+                ],
+                "checkboxGroupMinSelections": 1,
+                "checkboxGroupMaxSelections": 3
+            },
+            "textarea": {
+                "textareaRows": 5,
+                "textareaCols": 50,
+                "textareaResize": "vertical"
+            },
+            "file": {
+                "fileAccept": "",
+                "fileMultiple": true,
+                "fileMaxFiles": 100,
+                "fileMaxSize": 999999999
+            },
+            "date": {
+                "dateMinDate": null,
+                "dateMaxDate": null,
+                "dateFormat": "YYYY-MM-DD"
+            },
+            "datetime": {
+                "dateTimeMinDateTime": null,
+                "dateTimeMaxDateTime": null,
+                "dateTimeStep": 900
+            },
+            "time": {
+                "timeMinTime": null,
+                "timeMaxTime": null,
+                "timeStep": 1800
+            },
+            "daterange": {
+                "dateRangeMinDate": null,
+                "dateRangeMaxDate": null,
+                "dateRangePlaceholders": {
+                    "start": "Start Date",
+                    "end": "End Date"
+                }
+            },
+            "range": {
+                "rangeMin": 0,
+                "rangeMax": 100,
+                "rangeStep": 1,
+                "rangeFormat": {
+                    "type": "number"
+                }
+            },
+            "toggle": {
+                "toggleSize": "default",
+                "toggleLabels": {
+                    "on": "On",
+                    "off": "Off"
+                },
+                "toggleIcons": {
+                    "on": "fa-check",
+                    "off": "fa-times"
+                }
+            }
+        }
     }
-  },
-  "context": []
 }
