@@ -90,7 +90,7 @@
                 "selectSearchable": true,
                 "selectClearable": true,
                 "selectSorted": false,
-                "selectSortDirection": "ascending",
+                "selectSortDirection": "asc",
                 "selectOtherOption": false,
                 "selectOtherOptionLabel": "Other (specify)"
             },
@@ -101,7 +101,7 @@
                 "multiSelectSearchable": true,
                 "multiSelectClearable": true,
                 "multiSelectSorted": false,
-                "multiSelectSortDirection": "ascending",
+                "multiSelectSortDirection": "asc",
                 "multiSelectMinSelections": 1,
                 "multiSelectMaxSelections": 5
             },
