@@ -140,42 +140,44 @@ Affogato provides several artisan commands to help you create and manage your da
 ### Create a New Config
 
 ```bash
-php artisan affogato:config {config_name} {columns}
+php artisan add:config {config_name} {columns} {type=default}
 ```
 
 **Example:**
 ```bash
-php artisan affogato:config product "name,price,description"
+php artisan add:config product "name,price,description"
 ```
 
 This creates a new `product.json` configuration file in the `core/` directory with the specified columns.
 
+The optional `type` parameter sets the primary key type (default is `int`).
+
 ### Add Columns to Existing Config
 
 ```bash
-php artisan affogato:column {config_name} {columns}
+php artisan add:column {config_name} {columns}
 ```
 
 **Example:**
 ```bash
-php artisan affogato:column product "e_contact_email,n_stock_quantity"
+php artisan add:column product "e_contact_email,n_stock_quantity"
 ```
 
 ### Delete Columns from Config
 
 ```bash
-php artisan affogato:column-delete {config_name} {columns}
+php artisan delete:column {config_name} {columns}
 ```
 
 **Example:**
 ```bash
-php artisan affogato:column-delete product "old_field"
+php artisan delete:column product "old_field"
 ```
 
 ### Generate Models, Migrations & Factories
 
 ```bash
-php artisan affogato:configurator
+php artisan configurator
 ```
 
 This command reads all config files in `core/` and generates:
@@ -184,10 +186,15 @@ This command reads all config files in `core/` and generates:
 - Model Factories
 - API Controllers
 
+After generation, it automatically runs the Vue builder interpreter:
+```bash
+node vue/utils/builder/interpreter.js --all
+```
+
 ### Rollback Config Changes
 
 ```bash
-php artisan affogato:rollback {config_name}
+php artisan rollback:config {config_name}
 ```
 
 Restores the config to its most recent backup from `core/backups/`.
@@ -253,7 +260,7 @@ When creating columns, you can use prefixes to automatically set the backend typ
 Columns ending with `_id` are automatically detected as foreign keys:
 
 ```bash
-php artisan affogato:column order "customer_id,product_id"
+php artisan add:column order "customer_id,product_id"
 ```
 
 ---
@@ -415,10 +422,10 @@ Each form control has specific settings in `controlSettings`:
 
 ```bash
 # 1. Create config with columns
-php artisan affogato:config customer "name,e_email,p_password,d_birth_date,sel_status,fm_documents"
+php artisan add:config customer "name,e_email,p_password,d_birth_date,sel_status,fm_documents"
 
-# 2. Generate all files
-php artisan affogato:configurator
+# 2. Generate all files (also runs Vue builder automatically)
+php artisan configurator
 
 # 3. Run migrations
 php artisan migrate

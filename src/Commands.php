@@ -30,26 +30,16 @@ Artisan::command('delete:column {config} {columns}', function ($config, $columns
     console($this, $response);
 });
 
-Artisan::command('add:attribute {config} {columns}', function ($config, $columns) {
-    Command::boot();
-    $response = Command::makeAttribute($config, $columns);
-    console($this, $response);
-});
-
-Artisan::command('add:class {config} {columns}', function ($config, $columns) {
-    Command::boot();
-    $response = Command::makeClass($config, $columns);
-    console($this, $response);
-});
-
-Artisan::command('add:validation {config} {columns}', function ($config, $columns) {
-    Command::boot();
-    $response = Command::makeValidation($config, $columns);
-    console($this, $response);
-});
-
 Artisan::command('configurator', function () {
     Command::boot();
     $response = Command::configurator();
     console($this, $response);
+
+    // Run Vue builder interpreter after configurator completes
+    $this->info('Running Vue builder interpreter...');
+    $output = shell_exec('node vue/utils/builder/interpreter.js --all 2>&1');
+    if ($output) {
+        $this->line($output);
+    }
+    $this->info('Vue builder interpreter completed.');
 });
