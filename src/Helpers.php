@@ -146,6 +146,13 @@ function getColumn($config, $column)
     return null;
 }
 
+function isFileMultiple($column)
+{
+    return $column['frontend']['form_control'] === 'file'
+        && isset($column['frontend']['controlSettings']['file']['fileMultiple'])
+        && $column['frontend']['controlSettings']['file']['fileMultiple'] === true;
+}
+
 function getConfig($config)
 {
     return json_decode(file_get_contents(base_path("core/$config.json")), true);

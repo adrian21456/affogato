@@ -84,23 +84,24 @@ class AffogatoModel extends Model
 
             // For file fields, apply mimes validation only if a file is provided (nullable)
             if (isset($this->files[$field])) {
-                // Check if file formats are specified or if it's a wildcard '*'
-
                 $column = getColumn($this->table, $field);
 
+                // Check if this is a file control
                 if ($column['frontend']['form_control'] === 'file') {
-                    if ($this->files[$field] === '*' || empty($this->files[$field])) {
-                        $rules[$field] .= '|nullable';
+                    if (isFileMultiple($column)) {
+                        // File multiple validation
+                        if ($this->files[$field] === '*' || empty($this->files[$field])) {
+                            $rules[$field . ".*"] = 'sometimes';
+                        } else {
+                            $rules[$field . ".*"] = 'sometimes|mimes:' . $this->files[$field];
+                        }
                     } else {
-                        $rules[$field] .= '|nullable|mimes:' . $this->files[$field];
-                    }
-                }
-
-                if ($column['frontend']['form_control'] === 'file_multiple') {
-                    if ($this->files[$field] === '*' || empty($this->files[$field])) {
-                        $rules[$field . ".*"] = 'sometimes';
-                    } else {
-                        $rules[$field . ".*"] = 'sometimes|mimes:' . $this->files[$field];
+                        // Single file validation
+                        if ($this->files[$field] === '*' || empty($this->files[$field])) {
+                            $rules[$field] .= '|nullable';
+                        } else {
+                            $rules[$field] .= '|nullable|mimes:' . $this->files[$field];
+                        }
                     }
                 }
             }

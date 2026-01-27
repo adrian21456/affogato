@@ -209,7 +209,7 @@ class CRUDService
                     }
                 }
 
-                $isUpdatingFileMultiple = $updateLogic && $column['frontend']['form_control'] === 'file_multiple';
+                $isUpdatingFileMultiple = $updateLogic && isFileMultiple($column);
                 $recordFiles = []; //Existing files to be retained
                 $savedFiles = []; //New files stored
                 $namedFiles = []; //String files in the request payload

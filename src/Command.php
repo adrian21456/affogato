@@ -169,11 +169,13 @@ use Illuminate\Support\Facades\Route;");
             if ($type === 'file') {
                 $column['backend']['type'] = 'string';
                 $column['frontend']['form_control'] = 'file';
+                $column['frontend']['controlSettings']['file']['fileMultiple'] = false;
             }
 
             if ($type === 'file_multiple') {
                 $column['backend']['type'] = 'string';
-                $column['frontend']['form_control'] = 'file_multiple';
+                $column['frontend']['form_control'] = 'file';
+                $column['frontend']['controlSettings']['file']['fileMultiple'] = true;
             }
 
             if (in_array($column_name, self::$special_columns)) {
@@ -877,9 +879,9 @@ class $factoryClass extends Factory
             $type = $column['backend']['type'];
 
             /**
-             * Handle file and file_multiple controls
+             * Handle file controls (single or multiple based on controlSettings.file.fileMultiple)
              */
-            if (in_array($column['frontend']['form_control'], ['file', 'file_multiple'])) {
+            if ($column['frontend']['form_control'] === 'file') {
                 // Split file_types string or default to ['pdf']
                 $fileTypes = !empty($column['backend']['file_types'])
                     ? explode('|', $column['backend']['file_types'])
