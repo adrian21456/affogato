@@ -166,6 +166,7 @@ use Illuminate\Support\Facades\Route;");
                 $column['backend']['type'] = 'int';
             }
 
+            // File controls
             if ($type === 'file') {
                 $column['backend']['type'] = 'string';
                 $column['frontend']['form_control'] = 'file';
@@ -176,6 +177,70 @@ use Illuminate\Support\Facades\Route;");
                 $column['backend']['type'] = 'string';
                 $column['frontend']['form_control'] = 'file';
                 $column['frontend']['controlSettings']['file']['fileMultiple'] = true;
+            }
+
+            // Text input controls
+            if ($type === 'email') {
+                $column['backend']['type'] = 'string';
+                $column['frontend']['form_control'] = 'email';
+            }
+
+            if ($type === 'password') {
+                $column['backend']['type'] = 'string';
+                $column['frontend']['form_control'] = 'password';
+            }
+
+            if ($type === 'textarea') {
+                $column['backend']['type'] = 'text';
+                $column['frontend']['form_control'] = 'textarea';
+            }
+
+            // Numeric controls
+            if ($type === 'number') {
+                $column['backend']['type'] = 'int';
+                $column['frontend']['form_control'] = 'number';
+            }
+
+            if ($type === 'range') {
+                $column['backend']['type'] = 'int';
+                $column['frontend']['form_control'] = 'range';
+            }
+
+            // Date/Time controls
+            if ($type === 'daterange') {
+                $column['backend']['type'] = 'string';
+                $column['frontend']['form_control'] = 'daterange';
+            }
+
+            // Selection controls
+            if ($type === 'select') {
+                $column['backend']['type'] = 'string';
+                $column['frontend']['form_control'] = 'select';
+            }
+
+            if ($type === 'multiselect') {
+                $column['backend']['type'] = 'string';
+                $column['frontend']['form_control'] = 'multiselect';
+            }
+
+            if ($type === 'radio') {
+                $column['backend']['type'] = 'string';
+                $column['frontend']['form_control'] = 'radio';
+            }
+
+            if ($type === 'checkbox') {
+                $column['backend']['type'] = 'boolean';
+                $column['frontend']['form_control'] = 'checkbox';
+            }
+
+            if ($type === 'checkbox_group') {
+                $column['backend']['type'] = 'string';
+                $column['frontend']['form_control'] = 'checkbox_group';
+            }
+
+            if ($type === 'toggle') {
+                $column['backend']['type'] = 'boolean';
+                $column['frontend']['form_control'] = 'toggle';
             }
 
             if (in_array($column_name, self::$special_columns)) {
@@ -204,14 +269,32 @@ use Illuminate\Support\Facades\Route;");
                     $response['key'] = 'foreign';
                 }
                 $response['type'] = match (strtolower($columns_names[0])) {
+                    // Backend types
                     'i' => 'int',
+                    'b' => 'boolean',
+                    's' => 'string',
+                    // Date/Time controls
                     'd' => 'date',
                     't' => 'time',
-                    'b' => 'boolean',
                     'dt' => 'datetime',
-                    's' => 'string',
+                    'dr' => 'daterange',
+                    // File controls
                     'f' => 'file',
                     'fm' => 'file_multiple',
+                    // Text input controls
+                    'e' => 'email',
+                    'p' => 'password',
+                    'ta' => 'textarea',
+                    // Numeric controls
+                    'n' => 'number',
+                    'rng' => 'range',
+                    // Selection controls
+                    'sel' => 'select',
+                    'msel' => 'multiselect',
+                    'r' => 'radio',
+                    'cb' => 'checkbox',
+                    'cbg' => 'checkbox_group',
+                    'tgl' => 'toggle',
                     default => 'none',
                 };
 
