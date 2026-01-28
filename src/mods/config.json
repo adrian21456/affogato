@@ -29,7 +29,7 @@
     "edit": true,
     "delete": true,
     "migrations": false,
-    "layout": "single",
+    "layout": "top",
     "weight": [12],
     "sections": [
         {
