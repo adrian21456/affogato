@@ -80,6 +80,10 @@ use Illuminate\Support\Facades\Route;");
             $config['representative_value'] = $id;
             $config['ui']['page_name'] = $plural_name;
 
+            foreach ($config['urls'] as $key => $url) {
+                $config['urls'][$key] = str_replace('demo', $config_name, $url);
+            }
+
             //Create Primary Key
             $cols = [];
             $cols[] = self::columnGenerator($id, $type, 'primary');
