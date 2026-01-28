@@ -32,6 +32,8 @@
             "disabled": false
         },
         "layout": {
+            "forceType": false,
+            "forceWeight": false,
             "type": "top",
             "weight": 6,
             "icon": "fa-user",

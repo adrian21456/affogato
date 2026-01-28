@@ -29,6 +29,16 @@
     "edit": true,
     "delete": true,
     "migrations": false,
+    "layout": "single",
+    "weight": [12],
+    "sections": [
+        {
+            "name": "default",
+            "label": null,
+            "icon": null,
+            "columns": 1
+        }
+    ],
     "context": []
   },
   "columns": []
