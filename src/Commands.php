@@ -3,7 +3,7 @@
 use Zchted\Affogato\Command;
 use Illuminate\Support\Facades\Artisan;
 
-Artisan::command('add:config {config} {columns} {type=default}', function () {
+Artisan::command('add:config {config} {columns?} {type=default}', function () {
     $config = $this->argument('config');
     $columns = $this->argument('columns');
     $type = $this->argument('type');

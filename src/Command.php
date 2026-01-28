@@ -60,7 +60,7 @@ use Illuminate\Support\Facades\Route;");
     }
 
 
-    public static function makeConfig($config_name, $columns, $type = 'int'): array
+    public static function makeConfig($config_name, $columns = null, $type = 'int'): array
     {
         $comments = [];
         try {
@@ -68,7 +68,7 @@ use Illuminate\Support\Facades\Route;");
                 throw new \Exception("Config: $config_name.json already exists.");
             }
 
-            $columns = self::cleanColumns($columns);
+            $columns = !empty($columns) ? self::cleanColumns($columns) : [];
             $config = json_decode(file_get_contents(__DIR__ . "/mods/config.json"), true);
 
             //Change Contents

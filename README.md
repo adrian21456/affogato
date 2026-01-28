@@ -416,6 +416,114 @@ Each form control has specific settings in `controlSettings`:
 
 ---
 
+## 🔗 Relationships
+
+Relationships between configs are defined in the `relationship` property. They are **auto-populated** when `php artisan configurator` runs by scanning all configs for foreign key columns (columns ending in `_id`).
+
+### Config JSON Format
+
+```json
+"relationship": {
+    "<related_table_name>": "one" | "many"
+}
+```
+
+### How Auto-Fill Works
+
+When a config has a foreign key column (e.g., `customer_id`), `fillAllRelationships()` writes to both sides:
+
+- The **FK-owning table** (has the `_id` column) gets `"<parent_table>": "many"`
+- The **referenced table** (parent) gets `"<child_table>": "one"`
+
+### Generated Eloquent Code
+
+| Config Value | FK Column in Model? | Generated Relationship |
+|---|---|---|
+| `"category": "one"` | No | `HasOne` |
+| `"category": "many"` | No | `HasMany` |
+| Any value | Yes (`category_id` in columns) | `BelongsTo` |
+
+Each relationship also:
+- Adds a `use App\Models\<RelatedModel>;` import
+- Adds the key to `public array $join = [...]`
+
+### Example
+
+Given an `order` config with a `customer_id` foreign key column:
+
+**order.json** (auto-filled):
+```json
+"relationship": {
+    "customer": "many"
+}
+```
+
+Since `order` has the `customer_id` column, this generates a `BelongsTo`:
+```php
+public function customer(): BelongsTo {
+    return $this->belongsTo(Customer::class, 'customer_id', 'customer_id');
+}
+public array $join = ['customer'];
+```
+
+**customer.json** (auto-filled on the reverse side):
+```json
+"relationship": {
+    "order": "one"
+}
+```
+
+Since `customer` does NOT have an `order_id` column, this generates a `HasOne`:
+```php
+public function order(): HasOne {
+    return $this->hasOne(Order::class, 'customer_id', 'customer_id');
+}
+```
+
+You can manually change `"one"` to `"many"` in the customer config to generate `HasMany` instead.
+
+---
+
+## 📐 Attributes (Computed Accessors)
+
+Attributes define computed Laravel accessors that are automatically appended to JSON serialization (API responses).
+
+### Config JSON Format
+
+```json
+"attributes": {
+    "<attribute_name>": "<template string using {column_name}>"
+}
+```
+
+The `{column_name}` placeholders are converted to `{$this->column_name}` in the generated code.
+
+### Example
+
+```json
+"attributes": {
+    "full_name": "{first_name} {last_name}",
+    "display_label": "{title} ({code})"
+}
+```
+
+Generates in `ModModel.php`:
+```php
+public function getFullNameAttribute(): string {
+    return "{$this->first_name} {$this->last_name}";
+}
+
+public function getDisplayLabelAttribute(): string {
+    return "{$this->title} ({$this->code})";
+}
+
+public $appends = ['full_name', 'display_label'];
+```
+
+Because they are added to `$appends`, these computed values appear automatically in all API responses alongside regular columns.
+
+---
+
 ## 🚀 Usage Examples
 
 ### Creating a Complete Module
