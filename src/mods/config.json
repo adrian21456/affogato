@@ -6,6 +6,18 @@
   "seed": 10,
   "relationship": {},
   "attributes": {},
+  "urls": {
+    "list": "/api/demo",
+    "get": "/api/demo/:id",
+    "dropdown": "/api/demo/dropdown",
+    "search": "/api/demo/search",
+    "add": "/api/demo",
+    "update": "/api/demo/:id",
+    "delete": "/api/demo/:id",
+    "fileList": "/api/demo/files/:column",
+    "fileAdd": "/api/demo/files/:column",
+    "fileDelete": "/api/demo/files/:column/:filename"
+  },
   "ui": {
     "page_name": "Demo",
     "actions": true,
