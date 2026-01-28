@@ -161,6 +161,7 @@ use Illuminate\Support\Facades\Route;");
                 $column['backend']['nullable'] = false;
                 $column['frontend']['display']['form'] = false;
                 $column['frontend']['display']['table'] = false;
+                $column['frontend']['display']['view'] = false;
                 $column['backend']['type'] = 'int';
             }
 
