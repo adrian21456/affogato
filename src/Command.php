@@ -248,6 +248,12 @@ use Illuminate\Support\Facades\Route;");
                 $column['backend']['nullable'] = false;
                 $column['backend']['fillable'] = false;
             }
+
+            if (in_array($column_name, ['created_at', 'updated_at'])) {
+                $column['frontend']['display']['form'] = false;
+                $column['frontend']['display']['table'] = false;
+                $column['frontend']['display']['view'] = false;
+            }
             return $column;
         } catch (\Exception $e) {
             return [];
