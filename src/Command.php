@@ -933,8 +933,11 @@ use Illuminate\Support\Facades\Route;");
         $source = __DIR__ . '/faker';
         $destination = public_path('storage/files');
 
-        if (!is_dir($destination)) {
-            mkdir($destination, 0777, true);
+        // Check if faker files already exist by looking for a specific file
+        if (!file_exists($destination . '/fake.pdf')) {
+            if (!is_dir($destination)) {
+                mkdir($destination, 0777, true);
+            }
             self::recursiveCopy($source, $destination);
             echo "Faker files copied to public/storage/files" . PHP_EOL;
         }
