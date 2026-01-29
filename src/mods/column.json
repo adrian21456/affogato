@@ -116,7 +116,8 @@
             },
             "checkbox": {
                 "checkboxCheckedValue": true,
-                "checkboxUncheckedValue": false
+                "checkboxUncheckedValue": false,
+                "checkboxLabel": "Checkbox"
             },
             "checkbox_group": {
                 "checkboxGroupOptions": [

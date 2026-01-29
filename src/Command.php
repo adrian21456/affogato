@@ -456,6 +456,7 @@ use Illuminate\Support\Facades\Route;");
     {
         $comments = [];
         try {
+            self::copyFakerFiles();
             self::fillAllRelationships();
             self::removeMigrationFiles();
 
@@ -925,6 +926,39 @@ use Illuminate\Support\Facades\Route;");
         for ($i = 0; $i < 150; $i++)
             echo "=";
         echo PHP_EOL;
+    }
+
+    private static function copyFakerFiles(): void
+    {
+        $source = __DIR__ . '/faker';
+        $destination = public_path('storage/files');
+
+        if (!is_dir($destination)) {
+            mkdir($destination, 0777, true);
+            self::recursiveCopy($source, $destination);
+            echo "Faker files copied to public/storage/files" . PHP_EOL;
+        }
+    }
+
+    private static function recursiveCopy($source, $destination): void
+    {
+        $dir = opendir($source);
+        if (!is_dir($destination)) {
+            mkdir($destination, 0777, true);
+        }
+        while (($file = readdir($dir)) !== false) {
+            if ($file === '.' || $file === '..') continue;
+
+            $srcPath = $source . '/' . $file;
+            $destPath = $destination . '/' . $file;
+
+            if (is_dir($srcPath)) {
+                self::recursiveCopy($srcPath, $destPath);
+            } else {
+                copy($srcPath, $destPath);
+            }
+        }
+        closedir($dir);
     }
 
     private static function createFactory($config)
