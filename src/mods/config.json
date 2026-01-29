@@ -32,6 +32,7 @@
     "layout": "top",
     "weight": [12],
     "view_layout": "single",
+    "form_preview": false,
     "viewer": {
         "addForm": {
             "type": "modal",
