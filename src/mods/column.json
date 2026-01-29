@@ -19,7 +19,12 @@
         "display": {
             "view": true,
             "table": true,
-            "form": true
+            "form": true,
+            "add": true,
+            "edit": true,
+            "table_order": 1,
+            "form_order": 1,
+            "view_order": 1
         },
         "text": {
             "label": "",
@@ -63,9 +68,7 @@
             "view_type": "text",
             "alignment": "left",
             "section": "default",
-            "input_type": "textfield",
-            "showOnAdd": true,
-            "showOnEdit": true
+            "input_type": "textfield"
         },
         "controlSettings": {
             "text": {},
