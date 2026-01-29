@@ -31,6 +31,21 @@
     "migrations": false,
     "layout": "top",
     "weight": [12],
+    "viewer": {
+        "addForm": {
+            "type": "modal",
+            "weight": "50"
+        },
+        "editForm": {
+            "type": "modal",
+            "weight": "50"
+        },
+        "view": {
+            "type": "drawer_right",
+            "weight": "40",
+            "layout": "double"
+        }
+    },
     "sections": [
         {
             "name": "default",
