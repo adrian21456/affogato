@@ -931,7 +931,7 @@ use Illuminate\Support\Facades\Route;");
     private static function copyFakerFiles(): void
     {
         $source = __DIR__ . '/faker';
-        $destination = public_path('storage/files');
+        $destination = public_path('storage/files/faker');
 
         // Check if faker files already exist by looking for a specific file
         if (!file_exists($destination . '/fake.pdf')) {
@@ -939,7 +939,7 @@ use Illuminate\Support\Facades\Route;");
                 mkdir($destination, 0777, true);
             }
             self::recursiveCopy($source, $destination);
-            echo "Faker files copied to public/storage/files" . PHP_EOL;
+            echo "Faker files copied to public/storage/files/faker" . PHP_EOL;
         }
     }
 
