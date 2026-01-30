@@ -815,7 +815,20 @@ use Illuminate\Support\Facades\Route;");
                     $config['columns'][$key]['backend']['foreign'] = true;
                     $config['columns'][$key]['backend']['type'] = 'int';
                     $config['columns'][$key]['backend']['nullable'] = false;
+                    $config['columns'][$key]['frontend']['form_control'] = 'select';
                     $log[] = "Auto-tagged {$column['name']} as foreign field.";
+                }
+            }
+
+            //Auto-configure foreign columns
+            foreach ($config['columns'] as $key => $column) {
+                if (!isset($column['name'])) continue;
+
+                // Check if column is marked as foreign
+                if (isset($column['backend']['foreign']) && $column['backend']['foreign'] === true) {
+                    // Ensure backend type is int and form control is select
+                    $config['columns'][$key]['backend']['type'] = 'int';
+                    $config['columns'][$key]['frontend']['form_control'] = 'select';
                 }
             }
 
