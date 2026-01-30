@@ -802,6 +802,23 @@ use Illuminate\Support\Facades\Route;");
                 }
             }
 
+            //Auto-tag columns ending with "_id" (excluding primary key) as foreign fields
+            foreach ($config['columns'] as $key => $column) {
+                if (!isset($column['name'])) continue;
+
+                // Skip if already marked as primary or foreign
+                if ($column['backend']['primary'] ?? false) continue;
+
+                // Check if column name ends with "_id"
+                if (str_ends_with($column['name'], '_id')) {
+                    // Auto-tag as foreign field
+                    $config['columns'][$key]['backend']['foreign'] = true;
+                    $config['columns'][$key]['backend']['type'] = 'int';
+                    $config['columns'][$key]['backend']['nullable'] = false;
+                    $log[] = "Auto-tagged {$column['name']} as foreign field.";
+                }
+            }
+
             //Check for duplicated columns
             $names = [];
             $duplicates = [];
