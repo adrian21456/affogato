@@ -757,6 +757,26 @@ use Illuminate\Support\Facades\Route;");
     {
         $log = [];
         try {
+            //Ensure URLs are properly configured
+            $template = json_decode(file_get_contents(__DIR__ . "/mods/config.json"), true);
+            if (!isset($config['urls']) || empty($config['urls'])) {
+                $config['urls'] = $template['urls'];
+                $log[] = "URLs section was missing and has been added from template.";
+            }
+
+            // Replace 'demo' with actual config name in all URLs
+            foreach ($config['urls'] as $key => $url) {
+                $config['urls'][$key] = str_replace('demo', $config['name'], $url);
+            }
+
+            // Ensure all URL keys from template exist
+            foreach ($template['urls'] as $key => $url) {
+                if (!isset($config['urls'][$key])) {
+                    $config['urls'][$key] = str_replace('demo', $config['name'], $url);
+                    $log[] = "Missing URL key '$key' has been added.";
+                }
+            }
+
             //Check if it supports timestamp
             if ($config['timestamps']) {
                 $created_at = false;
@@ -832,18 +852,46 @@ use Illuminate\Support\Facades\Route;");
                 }
             }
 
-            //Auto-prettify text labels containing "Column"
+            //Auto-prettify and configure column frontend properties
             foreach ($config['columns'] as $key => $column) {
                 if (!isset($column['name'])) continue;
 
-                // Check if frontend.text.label contains "Column"
+                $prettified = properName($column['name']);
+                $prettified = rtrim($prettified, ' Id');
+
+                // Auto-set table.key if it contains "column"
+                if (isset($column['frontend']['table']['key']) &&
+                    str_contains(strtolower($column['frontend']['table']['key']), 'column')) {
+                    $config['columns'][$key]['frontend']['table']['key'] = $column['name'];
+                    $log[] = "Auto-set table.key for {$column['name']}.";
+                }
+
+                // Auto-set view.key if it contains "column"
+                if (isset($column['frontend']['view']['key']) &&
+                    str_contains(strtolower($column['frontend']['view']['key']), 'column')) {
+                    $config['columns'][$key]['frontend']['view']['key'] = $column['name'];
+                    $log[] = "Auto-set view.key for {$column['name']}.";
+                }
+
+                // Auto-prettify table.label if it contains "column"
+                if (isset($column['frontend']['table']['label']) &&
+                    str_contains(strtolower($column['frontend']['table']['label']), 'column')) {
+                    $config['columns'][$key]['frontend']['table']['label'] = $prettified;
+                    $log[] = "Auto-prettified table.label for {$column['name']} to '{$prettified}'.";
+                }
+
+                // Auto-prettify view.label if it contains "column"
+                if (isset($column['frontend']['view']['label']) &&
+                    str_contains(strtolower($column['frontend']['view']['label']), 'column')) {
+                    $config['columns'][$key]['frontend']['view']['label'] = $prettified;
+                    $log[] = "Auto-prettified view.label for {$column['name']} to '{$prettified}'.";
+                }
+
+                // Auto-prettify text.label if it contains "Column"
                 if (isset($column['frontend']['text']['label']) &&
                     str_contains($column['frontend']['text']['label'], 'Column')) {
-                    // Prettify using column name
-                    $prettified = properName($column['name']);
-                    $prettified = rtrim($prettified, ' Id');
                     $config['columns'][$key]['frontend']['text']['label'] = $prettified;
-                    $log[] = "Auto-prettified text label for {$column['name']} to '{$prettified}'.";
+                    $log[] = "Auto-prettified text.label for {$column['name']} to '{$prettified}'.";
                 }
             }
 
