@@ -819,6 +819,21 @@ use Illuminate\Support\Facades\Route;");
                 }
             }
 
+            //Auto-prettify text labels containing "Column"
+            foreach ($config['columns'] as $key => $column) {
+                if (!isset($column['name'])) continue;
+
+                // Check if frontend.text.label contains "Column"
+                if (isset($column['frontend']['text']['label']) &&
+                    str_contains($column['frontend']['text']['label'], 'Column')) {
+                    // Prettify using column name
+                    $prettified = properName($column['name']);
+                    $prettified = rtrim($prettified, ' Id');
+                    $config['columns'][$key]['frontend']['text']['label'] = $prettified;
+                    $log[] = "Auto-prettified text label for {$column['name']} to '{$prettified}'.";
+                }
+            }
+
             //Check for duplicated columns
             $names = [];
             $duplicates = [];
