@@ -14,9 +14,9 @@
     "add": "/api/demo",
     "update": "/api/demo/:id",
     "delete": "/api/demo/:id",
-    "fileList": "/api/demo/files/:column",
-    "fileAdd": "/api/demo/files/:column",
-    "fileDelete": "/api/demo/files/:column/:filename"
+    "fileList": "/api/demo/files/:column/:id",
+    "fileAdd": "/api/demo/files/:column/:id",
+    "fileDelete": "/api/demo/files/:column/:id/:filename"
   },
   "ui": {
     "page_name": "Demo",

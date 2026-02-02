@@ -6,6 +6,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Zchted\Affogato\CRUDEvent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CRUDService
 {
@@ -187,6 +188,173 @@ class CRUDService
 
         return [
             "message" => "Record has been removed"
+        ];
+    }
+
+    public function listFiles($item, $column)
+    {
+        $columnConfig = getColumn($this->model->table, $column);
+
+        if (!$columnConfig || $columnConfig['frontend']['form_control'] !== 'file') {
+            return [
+                "error" => "Column '{$column}' is not a valid file column"
+            ];
+        }
+
+        $record = $this->model->find($item);
+
+        if (!$record) {
+            return [
+                "error" => "Record not found"
+            ];
+        }
+
+        $files = $record[$column] ?? [];
+
+        BaseService::writeAuditLog(getModuleName(__CLASS__), 'listFiles', auth()->id() ?? null);
+
+        return [
+            "message" => "Files retrieved successfully",
+            "result" => $files
+        ];
+    }
+
+    public function addFile(Request $request, $item, $column)
+    {
+        $columnConfig = getColumn($this->model->table, $column);
+
+        if (!$columnConfig || $columnConfig['frontend']['form_control'] !== 'file') {
+            return [
+                "error" => "Column '{$column}' is not a valid file column"
+            ];
+        }
+
+        $record = $this->model->find($item);
+
+        if (!$record) {
+            return [
+                "error" => "Record not found"
+            ];
+        }
+
+        $file = $request->file('file');
+
+        if (!$file) {
+            return [
+                "error" => "No file provided"
+            ];
+        }
+
+        $extension = $file->getClientOriginalExtension();
+        $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $timestamp = date("YmdHis") . substr((string)microtime(), 2, 3);
+        $filename = "{$originalName} ({$timestamp}).{$extension}";
+
+        $filePath = BaseService::saveFile($file, $filename);
+
+        if (!$filePath) {
+            return [
+                "error" => "Failed to save file"
+            ];
+        }
+
+        $existingFiles = $record[$column] ?? [];
+
+        if (!is_array($existingFiles)) {
+            $existingFiles = [];
+        }
+
+        $existingFiles[] = $filePath;
+
+        $data_before = $record->toArray();
+        $record[$column] = $existingFiles;
+        $record->save();
+        $data_after = $record->toArray();
+
+        BaseService::writeAuditLog(getModuleName(__CLASS__), 'addFile', auth()->id() ?? null, $data_before, $data_after);
+
+        event(new CRUDEvent([
+            "action" => "addFile",
+            "data" => ["column" => $column, "file" => $filePath]
+        ]));
+
+        return [
+            "message" => "File added successfully",
+            "result" => [
+                "file" => $filePath,
+                "files" => $existingFiles
+            ]
+        ];
+    }
+
+    public function deleteFile($item, $column, $filename)
+    {
+        $columnConfig = getColumn($this->model->table, $column);
+
+        if (!$columnConfig || $columnConfig['frontend']['form_control'] !== 'file') {
+            return [
+                "error" => "Column '{$column}' is not a valid file column"
+            ];
+        }
+
+        $record = $this->model->find($item);
+
+        if (!$record) {
+            return [
+                "error" => "Record not found"
+            ];
+        }
+
+        $existingFiles = $record[$column] ?? [];
+
+        if (!is_array($existingFiles)) {
+            $existingFiles = [];
+        }
+
+        $fileToDelete = null;
+        $decodedFilename = urldecode($filename);
+
+        foreach ($existingFiles as $file) {
+            if (basename($file) === $decodedFilename || $file === $decodedFilename) {
+                $fileToDelete = $file;
+                break;
+            }
+        }
+
+        if (!$fileToDelete) {
+            return [
+                "error" => "File not found in column"
+            ];
+        }
+
+        $disk = env('FILESYSTEM_DISK', 'public');
+
+        if (Storage::disk($disk)->exists($fileToDelete)) {
+            Storage::disk($disk)->delete($fileToDelete);
+        }
+
+        $updatedFiles = array_values(array_filter($existingFiles, function ($file) use ($fileToDelete) {
+            return $file !== $fileToDelete;
+        }));
+
+        $data_before = $record->toArray();
+        $record[$column] = $updatedFiles;
+        $record->save();
+        $data_after = $record->toArray();
+
+        BaseService::writeAuditLog(getModuleName(__CLASS__), 'deleteFile', auth()->id() ?? null, $data_before, $data_after);
+
+        event(new CRUDEvent([
+            "action" => "deleteFile",
+            "data" => ["column" => $column, "file" => $fileToDelete]
+        ]));
+
+        return [
+            "message" => "File deleted successfully",
+            "result" => [
+                "deleted" => $fileToDelete,
+                "files" => $updatedFiles
+            ]
         ];
     }
 

@@ -6,3 +6,6 @@ Route::get('demo/{item}', [DemoController::class, 'show']);
 Route::post('demo', [DemoController::class, 'store']);
 Route::post('/demo/{item}', [DemoController::class, 'update']);
 Route::delete('demo/{item}', [DemoController::class, 'destroy']);
+Route::get('demo/files/{column}/{item}', [DemoController::class, 'listFiles']);
+Route::post('demo/files/{column}/{item}', [DemoController::class, 'addFile']);
+Route::delete('demo/files/{column}/{item}/{filename}', [DemoController::class, 'deleteFile']);

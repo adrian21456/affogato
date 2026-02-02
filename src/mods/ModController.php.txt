@@ -69,4 +69,25 @@ class ModDemoController extends Controller
     {
         return BaseService::getDropdownItems($request, $this->model);
     }
+
+    // GET /api/demo/files/{column}/{item}
+    public function listFiles($column, $item): array
+    {
+        BaseService::writeAuditLog(getModuleName(__CLASS__), getActionName(__FUNCTION__), auth()->id() ?? null);
+        return $this->crudService->listFiles($item, $column);
+    }
+
+    // POST /api/demo/files/{column}/{item}
+    public function addFile(Request $request, $column, $item): array
+    {
+        BaseService::writeAuditLog(getModuleName(__CLASS__), getActionName(__FUNCTION__), auth()->id() ?? null);
+        return $this->crudService->addFile($request, $item, $column);
+    }
+
+    // DELETE /api/demo/files/{column}/{item}/{filename}
+    public function deleteFile($column, $item, $filename): array
+    {
+        BaseService::writeAuditLog(getModuleName(__CLASS__), getActionName(__FUNCTION__), auth()->id() ?? null);
+        return $this->crudService->deleteFile($item, $column, $filename);
+    }
 }
