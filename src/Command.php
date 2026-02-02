@@ -645,10 +645,28 @@ use Illuminate\Support\Facades\Route;");
             $attributes = $config['attributes'] ?? [];
             foreach ($attributes as $key => $attribute) {
                 $methodName = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
-                $script = str_replace('{', '{$this->', $attribute);
-                $script = str_replace('"', '\"', $script); // escape double quotes
-
-                $attributes_code .= "public function get{$methodName}Attribute(): string\n\t{\n\t\treturn \"{$script}\";\n\t}\n\n";
+                
+                // Check if attribute contains relationship references (e.g., {student.full_name})
+                if (preg_match_all('/\{([a-zA-Z_]+)\.([a-zA-Z_]+)\}/', $attribute, $matches)) {
+                    // Contains relationship references
+                    $script = $attribute;
+                    for ($i = 0; $i < count($matches[0]); $i++) {
+                        $fullMatch = $matches[0][$i];
+                        $relationName = $matches[1][$i];
+                        $relationField = $matches[2][$i];
+                        
+                        // Replace {relation.field} with {$this->relation?->field}
+                        $script = str_replace($fullMatch, "{\$this->{$relationName}?->{$relationField}}", $script);
+                    }
+                    $script = str_replace('"', '\"', $script); // escape double quotes
+                    $attributes_code .= "\tpublic function get{$methodName}Attribute(): string\n\t{\n\t\treturn \"{$script}\";\n\t}\n\n\t";
+                } else {
+                    // Standard attribute with direct properties
+                    $script = str_replace('{', '{$this->', $attribute);
+                    $script = str_replace('"', '\"', $script); // escape double quotes
+                    $attributes_code .= "\tpublic function get{$methodName}Attribute(): string\n\t{\n\t\treturn \"{$script}\";\n\t}\n\n\t";
+                }
+                
                 $appends .= "'{$key}', ";
             }
 
