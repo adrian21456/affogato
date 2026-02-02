@@ -1108,11 +1108,12 @@ class $factoryClass extends Factory
 
             $field = $column['name'];
             $type = $column['backend']['type'];
+            $formControl = $column['frontend']['form_control'] ?? '';
 
             /**
              * Handle file controls (single or multiple based on controlSettings.file.fileMultiple)
              */
-            if ($column['frontend']['form_control'] === 'file') {
+            if ($formControl === 'file') {
                 // Split file_types string or default to ['pdf']
                 $fileTypes = !empty($column['backend']['file_types'])
                     ? explode('|', $column['backend']['file_types'])
@@ -1124,6 +1125,32 @@ class $factoryClass extends Factory
                 // Use generateFakeFile function
                 $fieldMappings[] = "            '$field' => [generateFakeFile('{$extension}')],";
                 continue;  // Skip default faker mapping
+            }
+
+            // Handle number control with number settings
+            if ($formControl === 'number' || $formControl === 'range') {
+                $min = $column['frontend']['controlSettings']['number']['numberMin'] ?? 0;
+                $max = $column['frontend']['controlSettings']['number']['numberMax'] ?? 100;
+                $step = $column['frontend']['controlSettings']['number']['numberStep'] ?? 1;
+                
+                // Determine if we need decimal precision
+                if ($step < 1 || in_array($type, ['float', 'double', 'decimal'])) {
+                    $decimals = 2; // default
+                    if ($step < 1) {
+                        $stepStr = (string)$step;
+                        if (strpos($stepStr, '.') !== false) {
+                            $decimals = strlen($stepStr) - strpos($stepStr, '.') - 1;
+                        }
+                    }
+                    $faker = "->randomFloat($decimals, $min, $max)";
+                } else {
+                    $faker = "->numberBetween($min, $max)";
+                }
+                
+                if (!$column['backend']['foreign']) {
+                    $fieldMappings[] = "            '$field' => \$this->faker$faker,";
+                    continue;
+                }
             }
 
             // Standard faker logic
