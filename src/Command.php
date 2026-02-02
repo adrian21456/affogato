@@ -1130,17 +1130,13 @@ class $factoryClass extends Factory
              * Handle file controls (single or multiple based on controlSettings.file.fileMultiple)
              */
             if ($formControl === 'file') {
-                // Split file_types string or default to ['pdf']
-                $fileTypes = !empty($column['backend']['file_types'])
-                    ? explode('|', $column['backend']['file_types'])
-                    : ['pdf'];
-
-                // Use first extension (or randomize here if needed)
-                $extension = strtolower(trim($fileTypes[0]));
-
-                // Use generateFakeFile function
-                $fieldMappings[] = "            '$field' => [generateFakeFile('{$extension}')],";
-                continue;  // Skip default faker mapping
+                $isMultiple = $column['frontend']['controlSettings']['file']['fileMultiple'] ?? false;
+                if ($isMultiple) {
+                    $fieldMappings[] = "            '$field' => [],";
+                } else {
+                    $fieldMappings[] = "            '$field' => null,";
+                }
+                continue;
             }
 
             // Handle number control with number settings
