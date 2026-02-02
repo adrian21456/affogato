@@ -569,7 +569,14 @@ use Illuminate\Support\Facades\Route;");
                 if (str_contains($column['frontend']['form_control'], 'file')) $files[$column['name']] = $column['backend']['file_types'];
                 if (!empty($column['backend']['length'])) $lengths[$column['name']] = $column['backend']['length'];
                 if (!empty($column['backend']['default'])) $defaults[$column['name']] = $column['backend']['default'];
-                if (!in_array($column['name'], self::$special_columns)) $casts[$column['name']] = $column['backend']['type'];
+                if (!in_array($column["name"], self::$special_columns)) {
+                    $cast_type = $column["backend"]["type"];
+                    // Add precision for decimal types
+                    if ($cast_type === "decimal") {
+                        $cast_type = "decimal:2";
+                    }
+                    $casts[$column["name"]] = $cast_type;
+                }
                 if (str_contains($column['frontend']['form_control'], 'file')) $casts[$column['name']] = "array";
             }
 
