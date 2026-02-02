@@ -648,21 +648,19 @@ use Illuminate\Support\Facades\Route;");
                 
                 $script = $attribute;
                 
-                // First, replace relationship references (e.g., {student.full_name})
-                if (preg_match_all('/\{([a-zA-Z_]+)\.([a-zA-Z_]+)\}/', $script, $matches)) {
-                    for ($i = 0; $i < count($matches[0]); $i++) {
-                        $fullMatch = $matches[0][$i];
-                        $relationName = $matches[1][$i];
-                        $relationField = $matches[2][$i];
-                        
-                        // Replace {relation.field} with {$this->relation?->field}
-                        $script = str_replace($fullMatch, "{\$this->{$relationName}?->{$relationField}}", $script);
-                    }
-                }
+                // Process all placeholders in a single pass to avoid conflicts
+                // First pass: Replace relationship references (e.g., {student.full_name})
+                $script = preg_replace_callback('/\{([a-zA-Z_]+)\.([a-zA-Z_]+)\}/', function($matches) {
+                    $relationName = $matches[1];
+                    $relationField = $matches[2];
+                    return "{\$this->{$relationName}?->{$relationField}}";
+                }, $script);
                 
-                // Then, replace direct property references (e.g., {semester}, {school_year})
-                // Match remaining {property} patterns that don't have the ? already
-                $script = preg_replace('/\{([a-zA-Z_]+)\}/', '{\$this->$1}', $script);
+                // Second pass: Replace direct property references (e.g., {semester}, {school_year})
+                // Only match simple {property} patterns (no $ or ? characters after the opening brace)
+                $script = preg_replace_callback('/\{([a-zA-Z_]+)\}/', function($matches) {
+                    return "{\$this->{$matches[1]}}";
+                }, $script);
                 
                 $script = str_replace('"', '\"', $script); // escape double quotes
                 $attributes_code .= "\tpublic function get{$methodName}Attribute(): string\n\t{\n\t\treturn \"{$script}\";\n\t}\n\n\t";
