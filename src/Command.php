@@ -1171,6 +1171,82 @@ class $factoryClass extends Factory
                 }
             }
 
+            // Handle option-based controls (select, multiselect, radio, checkbox, checkbox_group, toggle)
+            // Only for fields that don't end with "_id" (which are FK/PK)
+            if (!str_ends_with($field, '_id') && in_array($formControl, ['select', 'multiselect', 'radio', 'checkbox_group', 'toggle'])) {
+                $options = [];
+                
+                // Extract options based on control type
+                if ($formControl === 'select') {
+                    $options = $column['frontend']['controlSettings']['select']['selectOptions'] ?? [];
+                } elseif ($formControl === 'multiselect') {
+                    $options = $column['frontend']['controlSettings']['multiselect']['multiSelectOptions'] ?? [];
+                } elseif ($formControl === 'radio') {
+                    $options = $column['frontend']['controlSettings']['radio']['radioOptions'] ?? [];
+                } elseif ($formControl === 'checkbox_group') {
+                    $options = $column['frontend']['controlSettings']['checkbox_group']['checkboxGroupOptions'] ?? [];
+                } elseif ($formControl === 'toggle') {
+                    // Toggle typically has on/off values from toggleLabels
+                    $toggleLabels = $column['frontend']['controlSettings']['toggle']['toggleLabels'] ?? ['on' => 'On', 'off' => 'Off'];
+                    $options = [
+                        ['value' => true, 'label' => $toggleLabels['on']],
+                        ['value' => false, 'label' => $toggleLabels['off']]
+                    ];
+                }
+                
+                // Filter out null or placeholder options
+                $validOptions = array_filter($options, function($opt) {
+                    return isset($opt['value']) && $opt['value'] !== null && $opt['label'] !== 'Please select';
+                });
+                
+                if (!empty($validOptions)) {
+                    // For multiselect and checkbox_group, return array of random selections
+                    if (in_array($formControl, ['multiselect', 'checkbox_group'])) {
+                        $minSelections = 1;
+                        $maxSelections = min(3, count($validOptions));
+                        
+                        if ($formControl === 'multiselect') {
+                            $minSelections = $column['frontend']['controlSettings']['multiselect']['multiSelectMinSelections'] ?? 1;
+                            $maxSelections = $column['frontend']['controlSettings']['multiselect']['multiSelectMaxSelections'] ?? min(5, count($validOptions));
+                        } elseif ($formControl === 'checkbox_group') {
+                            $minSelections = $column['frontend']['controlSettings']['checkbox_group']['checkboxGroupMinSelections'] ?? 1;
+                            $maxSelections = $column['frontend']['controlSettings']['checkbox_group']['checkboxGroupMaxSelections'] ?? min(3, count($validOptions));
+                        }
+                        
+                        $valuesList = array_map(function($opt) {
+                            $val = $opt['value'];
+                            return is_bool($val) ? ($val ? 'true' : 'false') : (is_numeric($val) ? $val : "'$val'");
+                        }, array_values($validOptions));
+                        
+                        $faker = "->randomElements([" . implode(', ', $valuesList) . "], \$this->faker->numberBetween($minSelections, $maxSelections))";
+                    } else {
+                        // For select, radio, toggle - return single value
+                        $valuesList = array_map(function($opt) {
+                            $val = $opt['value'];
+                            return is_bool($val) ? ($val ? 'true' : 'false') : (is_numeric($val) ? $val : "'$val'");
+                        }, array_values($validOptions));
+                        
+                        $faker = "->randomElement([" . implode(', ', $valuesList) . "])";
+                    }
+                    
+                    $fieldMappings[] = "            '$field' => \$this->faker$faker,";
+                    continue;
+                }
+            }
+
+            // Handle checkbox control (single checkbox with checked/unchecked values)
+            if ($formControl === 'checkbox' && !str_ends_with($field, '_id')) {
+                $checkedValue = $column['frontend']['controlSettings']['checkbox']['checkboxCheckedValue'] ?? true;
+                $uncheckedValue = $column['frontend']['controlSettings']['checkbox']['checkboxUncheckedValue'] ?? false;
+                
+                $checkedStr = is_bool($checkedValue) ? ($checkedValue ? 'true' : 'false') : (is_numeric($checkedValue) ? $checkedValue : "'$checkedValue'");
+                $uncheckedStr = is_bool($uncheckedValue) ? ($uncheckedValue ? 'true' : 'false') : (is_numeric($uncheckedValue) ? $uncheckedValue : "'$uncheckedValue'");
+                
+                $faker = "->randomElement([$checkedStr, $uncheckedStr])";
+                $fieldMappings[] = "            '$field' => \$this->faker$faker,";
+                continue;
+            }
+
             // Standard faker logic
             switch ($type) {
                 case 'string':
