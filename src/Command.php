@@ -646,10 +646,10 @@ use Illuminate\Support\Facades\Route;");
             foreach ($attributes as $key => $attribute) {
                 $methodName = str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
                 
-                // Check if attribute contains relationship references (e.g., {student.full_name})
-                if (preg_match_all('/\{([a-zA-Z_]+)\.([a-zA-Z_]+)\}/', $attribute, $matches)) {
-                    // Contains relationship references
-                    $script = $attribute;
+                $script = $attribute;
+                
+                // First, replace relationship references (e.g., {student.full_name})
+                if (preg_match_all('/\{([a-zA-Z_]+)\.([a-zA-Z_]+)\}/', $script, $matches)) {
                     for ($i = 0; $i < count($matches[0]); $i++) {
                         $fullMatch = $matches[0][$i];
                         $relationName = $matches[1][$i];
@@ -658,14 +658,14 @@ use Illuminate\Support\Facades\Route;");
                         // Replace {relation.field} with {$this->relation?->field}
                         $script = str_replace($fullMatch, "{\$this->{$relationName}?->{$relationField}}", $script);
                     }
-                    $script = str_replace('"', '\"', $script); // escape double quotes
-                    $attributes_code .= "\tpublic function get{$methodName}Attribute(): string\n\t{\n\t\treturn \"{$script}\";\n\t}\n\n\t";
-                } else {
-                    // Standard attribute with direct properties
-                    $script = str_replace('{', '{$this->', $attribute);
-                    $script = str_replace('"', '\"', $script); // escape double quotes
-                    $attributes_code .= "\tpublic function get{$methodName}Attribute(): string\n\t{\n\t\treturn \"{$script}\";\n\t}\n\n\t";
                 }
+                
+                // Then, replace direct property references (e.g., {semester}, {school_year})
+                // Match remaining {property} patterns that don't have the ? already
+                $script = preg_replace('/\{([a-zA-Z_]+)\}/', '{\$this->$1}', $script);
+                
+                $script = str_replace('"', '\"', $script); // escape double quotes
+                $attributes_code .= "\tpublic function get{$methodName}Attribute(): string\n\t{\n\t\treturn \"{$script}\";\n\t}\n\n\t";
                 
                 $appends .= "'{$key}', ";
             }
