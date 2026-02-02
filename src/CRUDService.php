@@ -258,6 +258,9 @@ class CRUDService
             ];
         }
 
+        // Store only filename without directory prefix
+        $filePath = basename($filePath);
+
         $existingFiles = $record[$column] ?? [];
 
         if (!is_array($existingFiles)) {
@@ -448,6 +451,8 @@ class CRUDService
                     $filename = str_replace('.' . $extension, "", $file_name) . getFileSuffix() . '.' . $extension;
                     $filePath = BaseService::saveFile($file, $filename);
                     if(!$filePath) continue;
+                    // Store only filename without directory prefix
+                    $filePath = basename($filePath);
                     $savedFiles[] = $filePath;
                     $uploadedFiles[] = $filePath;
                 }
