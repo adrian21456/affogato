@@ -1154,7 +1154,30 @@ class $factoryClass extends Factory
 
                 case 'int':
                 case 'integer':
-                    $faker = '->numberBetween(1, 100)';
+                    // Use number settings from column if available
+                    $min = $column['frontend']['controlSettings']['number']['numberMin'] ?? 1;
+                    $max = $column['frontend']['controlSettings']['number']['numberMax'] ?? 100;
+                    $faker = "->numberBetween($min, $max)";
+                    break;
+
+                case 'float':
+                case 'double':
+                case 'decimal':
+                    // Use number settings from column if available
+                    $min = $column['frontend']['controlSettings']['number']['numberMin'] ?? 0;
+                    $max = $column['frontend']['controlSettings']['number']['numberMax'] ?? 100;
+                    $step = $column['frontend']['controlSettings']['number']['numberStep'] ?? 1;
+                    
+                    // Determine decimal places from step
+                    $decimals = 2; // default
+                    if ($step < 1) {
+                        $stepStr = (string)$step;
+                        if (strpos($stepStr, '.') !== false) {
+                            $decimals = strlen($stepStr) - strpos($stepStr, '.') - 1;
+                        }
+                    }
+                    
+                    $faker = "->randomFloat($decimals, $min, $max)";
                     break;
 
                 case 'date':
