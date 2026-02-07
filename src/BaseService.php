@@ -4,6 +4,8 @@ namespace Zchted\Affogato;
 
 use Zchted\Affogato\AuditLog;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
 
 class BaseService
 {
@@ -33,7 +35,20 @@ class BaseService
         $disk = env('FILESYSTEM_DISK', 'public');
         $path = ($disk === 'gcs') ? env('GOOGLE_CLOUD_STORAGE_FOLDER', 'files') : 'files';
 
-        return $file->storeAs($path, $filename, $disk);
+        $storedPath = $file->storeAs($path, $filename, $disk);
+
+        if (
+            $file instanceof UploadedFile
+            && !empty(env('DOCUMENT_PARSER_URL'))
+            && !empty(env('DOCUMENT_PARSER_HASH'))
+        ) {
+            Http::attach('file', file_get_contents($file->getRealPath()), $filename)
+                ->post(env('DOCUMENT_PARSER_URL'), [
+                    'hash' => generateDocumentParserHash(),
+                ]);
+        }
+
+        return $storedPath;
     }
 
     public function getConfig($config)

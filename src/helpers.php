@@ -297,6 +297,16 @@ if (!function_exists('generateFakeFile')) {
     }
 }
 
+function generateDocumentParserHash(): string
+{
+    $hash = env('DOCUMENT_PARSER_HASH');
+    $timezone = env('DOCUMENT_PARSER_TIMEZONE', 'UTC');
+    $now = new \DateTime('now', new \DateTimeZone($timezone));
+    $timestamp = $now->getTimestamp();
+
+    return "{$hash}_{$timestamp}";
+}
+
 function extractParameters($parameters)
 {
     if (isset($parameters[0]) && $parameters[0] instanceof \Illuminate\Http\Request) {
