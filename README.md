@@ -571,3 +571,118 @@ $isMultiple = isFileMultiple($column);
 ```
 
 ---
+
+## 🔄 Document Parser Runner – Systemd Service Installation Guide
+
+This guide explains how to install and run `document_parser_runner` as a **systemd service** on Ubuntu so it starts automatically on boot.
+
+### 📁 Script Details
+
+- **Service name:** `document_parser_runner`
+- **Script path:** `/development/document_parser/runner.sh`
+- **Run user:** `ubuntu`
+
+### 1️⃣ Ensure the Script Is Executable
+
+```bash
+chmod +x /development/document_parser/runner.sh
+```
+
+Make sure the script starts with a shebang:
+
+```bash
+#!/bin/bash
+```
+
+### 2️⃣ Create the Systemd Service File
+
+Create the service definition:
+
+```bash
+sudo nano /etc/systemd/system/document_parser_runner.service
+```
+
+Paste the following:
+
+```ini
+[Unit]
+Description=Document Parser Runner
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/development/document_parser
+ExecStart=/development/document_parser/runner.sh
+Restart=always
+RestartSec=5
+StandardOutput=append:/var/log/document_parser_runner.log
+StandardError=append:/var/log/document_parser_runner.log
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Save and exit.
+
+### 3️⃣ Reload Systemd and Enable the Service
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable document_parser_runner
+sudo systemctl start document_parser_runner
+```
+
+### 4️⃣ Verify Service Status
+
+```bash
+systemctl status document_parser_runner
+```
+
+Expected result:
+
+```
+Active: active (running)
+```
+
+### 5️⃣ View Logs
+
+#### Log file
+```bash
+tail -f /var/log/document_parser_runner.log
+```
+
+#### systemd journal
+```bash
+journalctl -u document_parser_runner -f
+```
+
+### 6️⃣ Test on Reboot
+
+```bash
+sudo reboot
+```
+
+After reboot:
+
+```bash
+systemctl status document_parser_runner
+```
+
+### ⚠️ Important Notes
+
+- Do **NOT** background the script (`&`) when running under systemd
+- Use **absolute paths** inside `runner.sh`
+- If the script exits, systemd will restart it automatically
+- For long-running workers, keep the script alive (loop or blocking process)
+
+### ✅ Uninstall / Disable Service
+
+```bash
+sudo systemctl stop document_parser_runner
+sudo systemctl disable document_parser_runner
+sudo rm /etc/systemd/system/document_parser_runner.service
+sudo systemctl daemon-reload
+```
+
+---
