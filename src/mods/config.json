@@ -35,16 +35,16 @@
     "form_preview": false,
     "viewer": {
         "addForm": {
-            "type": "modal",
-            "weight": "50"
+            "type": "drawer_left",
+            "weight": "35"
         },
         "editForm": {
-            "type": "modal",
-            "weight": "50"
+            "type": "drawer_right",
+            "weight": "35"
         },
         "view": {
             "type": "drawer_right",
-            "weight": "40",
+            "weight": "35",
             "layout": "double"
         }
     },
