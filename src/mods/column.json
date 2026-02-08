@@ -73,7 +73,7 @@
         "controlSettings": {
             "text": {},
             "email": {
-                "emailAllowedDomains": ["gmail.com", "outlook.com", "company.com"]
+                "emailAllowedDomains": []
             },
             "password": {
                 "passwordStrengthRequirements": {
