@@ -91,6 +91,13 @@
                 "numberStep": 1
             },
             "select": {
+                "dropdownSource": {
+                    "useSource": false,
+                    "url": null,
+                    "label": null,
+                    "value": null,
+                    "table": null
+                },
                 "selectOptions": [
                     { "value": null, "label": "Please select" }
                 ],
@@ -102,6 +109,13 @@
                 "selectOtherOptionLabel": "Other (specify)"
             },
             "multiselect": {
+                "dropdownSource": {
+                    "useSource": false,
+                    "url": null,
+                    "label": null,
+                    "value": null,
+                    "table": null
+                },
                 "multiSelectOptions": [
                     { "value": null, "label": "Please select" }
                 ],
