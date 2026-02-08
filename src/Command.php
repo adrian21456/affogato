@@ -579,6 +579,10 @@ use Illuminate\Support\Facades\Route;");
                     if ($cast_type === "decimal") {
                         $cast_type = "decimal:2";
                     }
+                    // JSON types should be cast as array in Laravel models
+                    if ($cast_type === "json") {
+                        $cast_type = "array";
+                    }
                     $casts[$column["name"]] = $cast_type;
                 }
                 if (str_contains($column['frontend']['form_control'], 'file')) $casts[$column['name']] = "array";
@@ -1152,6 +1156,14 @@ class $factoryClass extends Factory
                 continue;
             }
 
+            /**
+             * Handle multiselect and json types - just use empty array
+             */
+            if ($formControl === 'multiselect' || $type === 'json') {
+                $fieldMappings[] = "            '$field' => [],";
+                continue;
+            }
+
             // Handle number control with number settings
             if ($formControl === 'number' || $formControl === 'range') {
                 $min = $column['frontend']['controlSettings']['number']['numberMin'] ?? 0;
@@ -1207,18 +1219,13 @@ class $factoryClass extends Factory
                 });
                 
                 if (!empty($validOptions)) {
-                    // For multiselect and checkbox_group, return array of random selections
-                    if (in_array($formControl, ['multiselect', 'checkbox_group'])) {
+                    // For checkbox_group, return array of random selections
+                    if ($formControl === 'checkbox_group') {
                         $minSelections = 1;
                         $maxSelections = min(3, count($validOptions));
                         
-                        if ($formControl === 'multiselect') {
-                            $minSelections = $column['frontend']['controlSettings']['multiselect']['multiSelectMinSelections'] ?? 1;
-                            $maxSelections = $column['frontend']['controlSettings']['multiselect']['multiSelectMaxSelections'] ?? min(5, count($validOptions));
-                        } elseif ($formControl === 'checkbox_group') {
-                            $minSelections = $column['frontend']['controlSettings']['checkbox_group']['checkboxGroupMinSelections'] ?? 1;
-                            $maxSelections = $column['frontend']['controlSettings']['checkbox_group']['checkboxGroupMaxSelections'] ?? min(3, count($validOptions));
-                        }
+                        $minSelections = $column['frontend']['controlSettings']['checkbox_group']['checkboxGroupMinSelections'] ?? 1;
+                        $maxSelections = $column['frontend']['controlSettings']['checkbox_group']['checkboxGroupMaxSelections'] ?? min(3, count($validOptions));
                         
                         $valuesList = array_map(function($opt) {
                             $val = $opt['value'];
@@ -1226,7 +1233,7 @@ class $factoryClass extends Factory
                         }, array_values($validOptions));
                         
                         $faker = "->randomElements([" . implode(', ', $valuesList) . "], \$this->faker->numberBetween($minSelections, $maxSelections))";
-                    } else {
+                        $fieldMappings[] = "            '$field' => \$this->faker$faker,";
                         // For select, radio, toggle - return single value
                         $valuesList = array_map(function($opt) {
                             $val = $opt['value'];
@@ -1234,9 +1241,9 @@ class $factoryClass extends Factory
                         }, array_values($validOptions));
                         
                         $faker = "->randomElement([" . implode(', ', $valuesList) . "])";
+                        $fieldMappings[] = "            '$field' => \$this->faker$faker,";
                     }
                     
-                    $fieldMappings[] = "            '$field' => \$this->faker$faker,";
                     continue;
                 }
             }
@@ -1378,6 +1385,10 @@ class $factoryClass extends Factory
 
                 case 'text':
                     $line = "\$table->text('$name')";
+                    break;
+
+                case 'json':
+                    $line = "\$table->json('$name')";
                     break;
 
                 case 'boolean':
