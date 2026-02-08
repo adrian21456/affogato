@@ -168,7 +168,11 @@ use Illuminate\Support\Facades\Route;");
             if ($key === 'foreign') {
                 $column['backend']['foreign'] = true;
                 $column['backend']['nullable'] = false;
-                $column['backend']['type'] = 'int';
+                if (($column['frontend']['form_control'] ?? '') === 'multiselect') {
+                    $column['backend']['type'] = 'json';
+                } else {
+                    $column['backend']['type'] = 'int';
+                }
             }
 
             // File controls
@@ -856,9 +860,15 @@ use Illuminate\Support\Facades\Route;");
                 if (str_ends_with($column['name'], '_id')) {
                     // Auto-tag as foreign field
                     $config['columns'][$key]['backend']['foreign'] = true;
-                    $config['columns'][$key]['backend']['type'] = 'int';
                     $config['columns'][$key]['backend']['nullable'] = false;
-                    $config['columns'][$key]['frontend']['form_control'] = 'select';
+
+                    if (($column['frontend']['form_control'] ?? '') === 'multiselect') {
+                        $config['columns'][$key]['backend']['type'] = 'json';
+                    } else {
+                        $config['columns'][$key]['backend']['type'] = 'int';
+                        $config['columns'][$key]['frontend']['form_control'] = 'select';
+                    }
+
                     $log[] = "Auto-tagged {$column['name']} as foreign field.";
                 }
             }
@@ -869,9 +879,12 @@ use Illuminate\Support\Facades\Route;");
 
                 // Check if column is marked as foreign
                 if (isset($column['backend']['foreign']) && $column['backend']['foreign'] === true) {
-                    // Ensure backend type is int and form control is select
-                    $config['columns'][$key]['backend']['type'] = 'int';
-                    $config['columns'][$key]['frontend']['form_control'] = 'select';
+                    if (($column['frontend']['form_control'] ?? '') === 'multiselect') {
+                        $config['columns'][$key]['backend']['type'] = 'json';
+                    } else {
+                        $config['columns'][$key]['backend']['type'] = 'int';
+                        $config['columns'][$key]['frontend']['form_control'] = 'select';
+                    }
                 }
             }
 
