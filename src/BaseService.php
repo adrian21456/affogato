@@ -32,10 +32,17 @@ class BaseService
             return null;
         }
 
+        // Sanitize filename: remove special characters except dashes and underscores
+        $pathInfo = pathinfo($filename);
+        $basename = $pathInfo['filename'];
+        $extension = isset($pathInfo['extension']) ? '.' . $pathInfo['extension'] : '';
+        $sanitizedBasename = preg_replace('/[^a-zA-Z0-9_-]/', '', $basename);
+        $sanitizedFilename = $sanitizedBasename . $extension;
+
         $disk = env('FILESYSTEM_DISK', 'public');
         $path = ($disk === 'gcs') ? env('GOOGLE_CLOUD_STORAGE_FOLDER', 'files') : 'files';
 
-        $storedPath = $file->storeAs($path, $filename, $disk);
+        $storedPath = $file->storeAs($path, $sanitizedFilename, $disk);
 
         if (
             $file instanceof UploadedFile
