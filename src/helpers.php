@@ -5,6 +5,7 @@ use GuzzleHttp\Psr7\UploadedFile;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Http\File;
 
@@ -305,6 +306,47 @@ function generateDocumentParserHash(): string
     $timestamp = $now->getTimestamp();
 
     return "{$hash}_{$timestamp}";
+}
+
+if (!function_exists('getDocumentParserURL')) {
+    /**
+     * Get the Document Parser URL from environment or remote configuration.
+     *
+     * Priority order:
+     * 1. DOCUMENT_PARSER_URL environment variable (if set)
+     * 2. Fetch from SOURCE_URL/urls.json (if SOURCE_URL is set)
+     * 3. Fetch from https://miracodes.com/urls.json (default fallback)
+     *
+     * @return string|null The document parser URL or null if unavailable
+     */
+    function getDocumentParserURL(): ?string
+    {
+        // First priority: Direct environment variable
+        $documentParserUrl = env('DOCUMENT_PARSER_URL');
+
+        if (!empty($documentParserUrl)) {
+            return $documentParserUrl;
+        }
+
+        // Second priority: Fetch from remote configuration
+        $sourceUrl = env('SOURCE_URL');
+        $urlsJsonPath = !empty($sourceUrl)
+            ? rtrim($sourceUrl, '/') . '/urls.json'
+            : 'https://miracodes.com/urls.json';
+
+        try {
+            $response = Http::get($urlsJsonPath);
+            if ($response->successful()) {
+                $urls = $response->json();
+                return $urls['document_parser'] ?? null;
+            }
+        } catch (\Exception $e) {
+            // Silently fail if remote config is unavailable
+            return null;
+        }
+
+        return null;
+    }
 }
 
 function extractParameters($parameters)

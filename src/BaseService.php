@@ -46,33 +46,15 @@ class BaseService
 
         if (
             $file instanceof UploadedFile
+            && env('USE_DOCUMENT_PARSER', false)
             && !empty(env('DOCUMENT_PARSER_HASH'))
         ) {
-            // Get document parser URL from env or fallback to remote config
-            $documentParserUrl = env('DOCUMENT_PARSER_URL');
-
-            if (empty($documentParserUrl)) {
-                // Determine the source URL for fetching urls.json
-                $sourceUrl = env('SOURCE_URL');
-                $urlsJsonPath = !empty($sourceUrl)
-                    ? rtrim($sourceUrl, '/') . '/urls.json'
-                    : 'https://miracodes.com/urls.json';
-
-                try {
-                    $response = Http::get($urlsJsonPath);
-                    if ($response->successful()) {
-                        $urls = $response->json();
-                        $documentParserUrl = $urls['document_parser'] ?? null;
-                    }
-                } catch (\Exception $e) {
-                    // Silently fail if remote config is unavailable
-                    $documentParserUrl = null;
-                }
-            }
+            // Get document parser URL using helper
+            $documentParserUrl = getDocumentParserURL();
 
             if (!empty($documentParserUrl)) {
                 Http::attach('file', file_get_contents($file->getRealPath()), $filename)
-                    ->post($documentParserUrl, [
+                    ->post($documentParserUrl . 'upload.php', [
                         'hash' => generateDocumentParserHash(),
                     ]);
             }
