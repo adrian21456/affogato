@@ -32,11 +32,11 @@ class BaseService
             return null;
         }
 
-        // Sanitize filename: remove special characters except dashes and underscores
+        // Sanitize filename: replace special characters with spaces, allow parentheses, dashes, and underscores
         $pathInfo = pathinfo($filename);
         $basename = $pathInfo['filename'];
         $extension = isset($pathInfo['extension']) ? '.' . $pathInfo['extension'] : '';
-        $sanitizedBasename = preg_replace('/[^a-zA-Z0-9_-]/', '', $basename);
+        $sanitizedBasename = preg_replace('/[^a-zA-Z0-9_\-() ]/', ' ', $basename);
         $sanitizedFilename = $sanitizedBasename . $extension;
 
         $disk = env('FILESYSTEM_DISK', 'public');
@@ -53,7 +53,7 @@ class BaseService
             $documentParserUrl = getDocumentParserURL();
 
             if (!empty($documentParserUrl)) {
-                Http::attach('file', file_get_contents($file->getRealPath()), $filename)
+                Http::attach('file', file_get_contents($file->getRealPath()), $sanitizedFilename)
                     ->post($documentParserUrl . 'upload.php', [
                         'hash' => generateDocumentParserHash(),
                     ]);
