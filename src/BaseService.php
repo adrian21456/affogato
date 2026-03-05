@@ -78,9 +78,28 @@ class BaseService
         $value = $Request->input('value', $model->table . "_id");
         $label = $Request->input('label', $config['representative_value']);
 
-        $items = $model::select([$value, $label])->get();
-        $dropdownItems = [];
+        // Check if the label is a computed attribute defined via a relation (e.g. "{crop.crop_name}")
+        $attributes = $config['attributes'] ?? [];
+        $isComputedAttribute = isset($attributes[$label]);
 
+        if ($isComputedAttribute) {
+            // Extract relation names from patterns like "{relation.field}"
+            $relations = [];
+            preg_match_all('/\{(\w+)\.\w+\}/', $attributes[$label], $matches);
+            if (!empty($matches[1])) {
+                $relations = array_unique($matches[1]);
+            }
+
+            $query = $model::query();
+            if (!empty($relations)) {
+                $query->with($relations);
+            }
+            $items = $query->get();
+        } else {
+            $items = $model::select([$value, $label])->get();
+        }
+
+        $dropdownItems = [];
         foreach ($items as $item) {
             $dropdownItems[] = [
                 'value' => $item->$value,
