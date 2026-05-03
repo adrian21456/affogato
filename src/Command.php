@@ -1536,25 +1536,94 @@ $fieldsCode
 
     public static function runSeeder($command): void
     {
-        $sortedConfigs = Command::getSortedConfigurations();
+        $seedOrderFile = base_path('core/__seed_order.json');
+        if (file_exists($seedOrderFile)) {
+            $sortedConfigs = json_decode(file_get_contents($seedOrderFile), true) ?? [];
+            $command->info("📋 Using seed order from __seed_order.json");
+        } else {
+            $sortedConfigs = Command::getSortedConfigurations();
+        }
 
         foreach ($sortedConfigs as $configName) {
-            $modelClass = 'App\\Models\\' . Str::studly($configName);
-            $config = json_decode(file_get_contents(base_path("core/$configName.json")), true);
-            $seed = env('SEEDER_COUNT', 10); // Default seed count
-            if (array_key_exists('seed', $config)) {
-                $seed = intval($config['seed']);
+            $configFile = base_path("core/$configName.json");
+            if (!file_exists($configFile)) {
+                $command->warn("⚠️Config file not found: $configName.json");
+                continue;
             }
 
-            if (class_exists($modelClass)) {
-                if ($modelClass::count() === 0) {
-                    $modelClass::factory()->count($seed)->create();
-                    $command->info("✅Seeded $seed entries: $modelClass");
-                } else {
-                    $command->info("ℹ️Already seeded: $modelClass");
-                }
-            } else {
+            $modelClass = 'App\\Models\\' . Str::studly($configName);
+            $config = json_decode(file_get_contents($configFile), true);
+            $seedData = $config['seed'] ?? null;
+
+            if (!class_exists($modelClass)) {
                 $command->warn("⚠️Model not found for config: $configName");
+                continue;
+            }
+
+            // Skip if seed is explicitly set to an empty array
+            if (is_array($seedData) && empty($seedData)) {
+                $command->info("⏭️Skipping (seed is empty): $modelClass");
+                continue;
+            }
+
+            // Skip if seed is an integer <= 0
+            if (is_numeric($seedData) && intval($seedData) <= 0) {
+                $command->info("⏭️Skipping (seed is 0): $modelClass");
+                continue;
+            }
+
+            if ($modelClass::count() > 0) {
+                $command->info("ℹ️Already seeded: $modelClass");
+                continue;
+            }
+
+            // Explicit seed rows: seed is a non-empty array of key-value objects
+            if (is_array($seedData) && !empty($seedData) && is_array($seedData[0])) {
+                // Build foreign-key column → related model class map
+                $foreignMap = [];
+                foreach ($config['columns'] as $column) {
+                    if (($column['backend']['foreign'] ?? false) === true) {
+                        $fieldName = $column['name'];
+                        $relatedName = str_replace('_id', '', $fieldName);
+                        $foreignMap[$fieldName] = 'App\\Models\\' . Str::studly($relatedName);
+                    }
+                }
+
+                $year = (int) date('Y');
+                $month = (int) date('m');
+                $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+
+                foreach ($seedData as $row) {
+                    $resolved = [];
+                    foreach ($row as $key => $value) {
+                        if ($value === 'MAPPED') {
+                            $foreignClass = $foreignMap[$key] ?? null;
+                            $resolved[$key] = ($foreignClass && class_exists($foreignClass))
+                                ? $foreignClass::inRandomOrder()->value($key)
+                                : null;
+                        } elseif ($value === null && in_array($key, ['created_at', 'updated_at'])) {
+                            $resolved[$key] = sprintf(
+                                '%04d-%02d-%02d %02d:%02d:%02d',
+                                $year, $month,
+                                rand(1, $daysInMonth),
+                                rand(0, 23), rand(0, 59), rand(0, 59)
+                            );
+                        } else {
+                            $resolved[$key] = $value;
+                        }
+                    }
+                    $modelClass::create($resolved);
+                }
+
+                $command->info("✅Seeded " . count($seedData) . " explicit entries: $modelClass");
+            } else {
+                // Numeric or missing seed → use factory
+                $seed = env('SEEDER_COUNT', 10);
+                if (is_numeric($seedData)) {
+                    $seed = intval($seedData);
+                }
+                $modelClass::factory()->count($seed)->create();
+                $command->info("✅Seeded $seed entries: $modelClass");
             }
         }
     }

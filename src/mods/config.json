@@ -3,7 +3,7 @@
   "representative_value": "demo_id",
   "timestamps": true,
   "soft_delete": false,
-  "seed": 10,
+  "seed": 0,
   "relationship": {},
   "attributes": {},
   "urls": {
