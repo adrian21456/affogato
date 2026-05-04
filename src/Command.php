@@ -1581,11 +1581,15 @@ $fieldsCode
             if (is_array($seedData) && !empty($seedData) && is_array($seedData[0])) {
                 // Build foreign-key column → related model class map
                 $foreignMap = [];
+                $passwordFields = [];
                 foreach ($config['columns'] as $column) {
                     if (($column['backend']['foreign'] ?? false) === true) {
                         $fieldName = $column['name'];
                         $relatedName = str_replace('_id', '', $fieldName);
                         $foreignMap[$fieldName] = 'App\\Models\\' . Str::studly($relatedName);
+                    }
+                    if (($column['frontend']['form_control'] ?? '') === 'password') {
+                        $passwordFields[] = $column['name'];
                     }
                 }
 
@@ -1608,6 +1612,8 @@ $fieldsCode
                                 rand(1, $daysInMonth),
                                 rand(0, 23), rand(0, 59), rand(0, 59)
                             );
+                        } elseif (in_array($key, $passwordFields) && is_string($value) && $value !== '') {
+                            $resolved[$key] = \Illuminate\Support\Facades\Hash::make($value);
                         } else {
                             $resolved[$key] = $value;
                         }
