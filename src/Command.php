@@ -148,10 +148,10 @@ use Illuminate\Support\Facades\Route;");
 
             $column['backend']['type'] = $type;
             $column['backend']['name'] = $column_name;
-            $column['frontend']['table']['label'] = rtrim($proper_name, " Id");
+            $column['frontend']['table']['label'] = Str::replaceLast(' Id', '', $proper_name);
             $column['frontend']['table']['key'] = $column_name;
-            $column['frontend']['text']['label'] = rtrim($proper_name, " Id");
-            $column['frontend']['view']['label'] = rtrim($proper_name, " Id");
+            $column['frontend']['text']['label'] = Str::replaceLast(' Id', '', $proper_name);
+            $column['frontend']['view']['label'] = Str::replaceLast(' Id', '', $proper_name);
             $column['frontend']['view']['key'] = $column_name;
             $column['name'] = $column_name;
 
@@ -897,7 +897,7 @@ use Illuminate\Support\Facades\Route;");
                 if (!isset($column['name'])) continue;
 
                 $prettified = properName($column['name']);
-                $prettified = rtrim($prettified, ' Id');
+                $prettified = Str::replaceLast(' Id', '', $prettified);
 
                 // Auto-set table.key if it contains "column"
                 if (isset($column['frontend']['table']['key']) &&
